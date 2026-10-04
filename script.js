@@ -1,15 +1,12 @@
-// ========================================
-// ELEMENTOS DE LA INTERFAZ
-// ========================================
+// Elementos de la interfaz
 
 const contenedorBarras = document.getElementById("contenedor-barras");
 const botonGenerar = document.getElementById("generar");
 const botonIniciar = document.getElementById("iniciar");
-const botonReiniciar = document.getElementById("reiniciar")
+const botonReiniciar = document.getElementById("reiniciar");
+const controlVelocidad = document.getElementById("velocidad");
 
-// ========================================
-// CONFIGURACIÓN
-// ========================================
+// Configuracion
 
 const cantidadElementos = 20;
 
@@ -22,16 +19,12 @@ let intercambios = 0;
 let posicionesOrdenadas = [];
 
 let ejecutando = false;
+let velocidad = 300;
 
-
-// ========================================
-// GENERAR DATOS
-// ========================================
 
 function generarDatos() {
 
-    // Si el algoritmo está ejecutándose,
-    // no permitimos generar nuevos datos.
+    // No genera datos nuevos mientras el algoritmo esta en proceso
     if (ejecutando) {
         return;
     }
@@ -39,7 +32,7 @@ function generarDatos() {
     datos = [];
     posicionesOrdenadas=[];
 
-    // Generamos los números aleatorios
+    // Genera numeros aleatorios
     for (let i = 0; i < cantidadElementos; i++) {
 
         const valor = Math.floor(Math.random() * 91) + 10;
@@ -47,7 +40,7 @@ function generarDatos() {
         datos.push(valor);
     }
 
-    // Reiniciamos las métricas
+    // Reinicio metricas
     comparaciones = 0;
     intercambios = 0;
 
@@ -57,10 +50,6 @@ function generarDatos() {
     mostrarBarras();
 }
 
-
-// ========================================
-// MOSTRAR LAS BARRAS
-// ========================================
 
 function mostrarBarras() {
 
@@ -98,9 +87,6 @@ function mostrarBarras() {
 }
 
 
-// ========================================
-// ACTUALIZAR MÉTRICAS
-// ========================================
 
 function actualizarMetricas() {
 
@@ -108,23 +94,8 @@ function actualizarMetricas() {
 
     document.getElementById("intercambios").textContent = intercambios;
 }
-// ========================================
-// REINICIAR
-// ========================================
-
-function reiniciar() {
-
-    if (ejecutando) {
-        return;
-    }
-
-    generarDatos();
-}
 
 
-// ========================================
-// ESPERAR
-// ========================================
 
 function esperar(tiempo) {
 
@@ -135,14 +106,17 @@ function esperar(tiempo) {
     });
 }
 
+function actualizarVelocidad(){
+    const valor = Number(controlVelocidad.value);
+    velocidad = 600 - (valor*50);
+}
+controlVelocidad.addEventListener("input", actualizarVelocidad);
+actualizarVelocidad();
 
-// ========================================
-// BUBBLE SORT
-// ========================================
 
 async function bubbleSort() {
 
-    // Indicamos que el algoritmo está ejecutándose
+
     ejecutando = true;
 
     // Recorremos el arreglo
@@ -163,8 +137,8 @@ async function bubbleSort() {
 
             actualizarMetricas();
 
-            // Esperamos para poder ver la comparación
-            await esperar(300);
+            // Esperamos para poder ver la comparacion
+            await esperar(velocidad);
 
 
             // Comparamos los valores
@@ -177,7 +151,7 @@ async function bubbleSort() {
                 barras[j].classList.add("intercambiando");
                 barras[j + 1].classList.add("intercambiando");
 
-                await esperar(300);
+                await esperar(velocidad);
 
 
                 // Intercambiamos los valores
@@ -198,11 +172,11 @@ async function bubbleSort() {
                 mostrarBarras();
 
 
-                await esperar(300);
+                await esperar(velocidad);
 
             } else {
 
-                // Quitamos el color de comparación
+                // Quitamos el color de comparacion
                 barras[j].classList.remove("comparando");
                 barras[j + 1].classList.remove("comparando");
 
@@ -212,31 +186,25 @@ async function bubbleSort() {
         // Obtenemos las barras actualizadas
         const barras = document.querySelectorAll(".barra");
 
-        // Marcamos como ordenada la última posición
+        // Marcamos como ordenada la ultima posicion
         posicionesOrdenadas.push(datos.length -1 -i);
         mostrarBarras();
 
-        await esperar(200);
+        await esperar(velocidad);
     }
 
 
-    // Marcamos la primera posición como ordenada
+    // Marcamos la primera posicion como ordenada
     posicionesOrdenadas.push(0);
     mostrarBarras();
 
 
-    // Terminamos la ejecución
     ejecutando = false;
 }
 
-// ========================================
-// REINICIAR
-// ========================================
-
 function reiniciar() {
 
-    // Si el algoritmo está ejecutándose,
-    // no permitimos reiniciar.
+    // No se puede reiniciar mientras el algoritmo esta en ejecucion
     if (ejecutando) {
         return;
     }
@@ -247,26 +215,19 @@ function reiniciar() {
     // Eliminamos las posiciones ordenadas
     posicionesOrdenadas = [];
 
-    // Reiniciamos las métricas
+    // Reinicio metricas
     comparaciones = 0;
     intercambios = 0;
 
     actualizarMetricas();
 
-    // Generamos nuevamente los datos
+
     generarDatos();
 }
-// ========================================
-// BOTÓN GENERAR
-// ========================================
 
 botonGenerar.addEventListener("click", generarDatos);
 botonReiniciar.addEventListener("click", reiniciar);
 
-
-// ========================================
-// BOTÓN INICIAR
-// ========================================
 
 botonIniciar.addEventListener("click", function() {
 
@@ -280,8 +241,5 @@ botonIniciar.addEventListener("click", function() {
 });
 
 
-// ========================================
-// GENERAR DATOS AL ABRIR LA PÁGINA
-// ========================================
 
 generarDatos();
