@@ -15,6 +15,28 @@ body {
 }
 
 .barra {
-    width: 25px;
+    width: 30px;
     background-color: steelblue;
+
+    /* Coloca el número encima de la barra */
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    /* Texto de la barra */
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.barra.comparando {
+    background-color: orange;
+}
+
+.barra.intercambiando {
+    background-color: red;
+}
+
+.barra.ordenada {
+    background-color: green;
 }

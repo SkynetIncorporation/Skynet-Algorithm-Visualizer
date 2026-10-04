@@ -1,60 +1,52 @@
-// ========================================
-// ELEMENTOS DE LA INTERFAZ
-// ========================================
+// Elementos de la interfaz
 
 const contenedorBarras = document.getElementById("contenedor-barras");
 const botonGenerar = document.getElementById("generar");
 
 
-// ========================================
-// CONFIGURACIÓN
-// ========================================
+// Configuracion
 
 const cantidadElementos = 20;
 
 
-// ========================================
-// GENERAR DATOS
-// ========================================
+// Generacion de datos
 
 function generarDatos() {
 
-    // Limpiamos las barras anteriores
+    // Limpieza de las barras anteriores
     contenedorBarras.innerHTML = "";
 
-    // Generamos los elementos
+    // Generacion de los elementos
     for (let i = 0; i < cantidadElementos; i++) {
 
-        // Número aleatorio entre 10 y 100
+        // Numero aleatorio entre 10 y 100
         const valor = Math.floor(Math.random() * 91) + 10;
-
-        // Creamos una barra
+        //Crear barra
         const barra = document.createElement("div");
 
-        // Le asignamos la clase barra
+// Le asignamos la clase barra
         barra.classList.add("barra");
 
-        // La altura representa el valor
+// La altura representa el valor
         barra.style.height = valor + "%";
 
-        // Guardamos el valor dentro de la barra
+// Guardamos el valor dentro de la barra
         barra.dataset.valor = valor;
 
-        // Agregamos la barra al contenedor
+// Mostramos el valor encima de la barra
+        barra.textContent = valor;
+
+// Agregamos la barra al contenedor
         contenedorBarras.appendChild(barra);
     }
 }
 
 
-// ========================================
-// BOTÓN GENERAR DATOS
-// ========================================
+// Boton generar datos
 
 botonGenerar.addEventListener("click", generarDatos);
 
 
-// ========================================
-// GENERAR DATOS AL CARGAR LA PÁGINA
-// ========================================
+// Generar datos para cargar pagina
 
 generarDatos();
