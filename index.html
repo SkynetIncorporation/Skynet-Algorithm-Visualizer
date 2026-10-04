@@ -6,15 +6,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Skynet Algorithm Visualizer</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <h1>Skynet Algorithm Visualizer</h1>
+    <!-- Encabezado principal -->
+    <header>
+        <h1>Skynet Algorithm Visualizer</h1>
+        <p>Visualizador de algoritmos de ordenamiento</p>
+    </header>
 
-    <p>
-        Visualizador de algoritmos de ordenamiento
-    </p>
+
+    <!-- Controles principales -->
+    <main>
+
+        <section class="controles">
+
+            <label for="algoritmo">
+                Algoritmo:
+            </label>
+            <select id="algoritmo">
+            <option value="bubble">Bubble Sort</option>
+            <option value="selection">Selection Sort</option>
+            <option value="insertion">Insertion Sort</option>
+            <option value="gnome">Gnome Sort</option>
+            <option value="exchange">Exchange Sort</option>
+            <option value="stooge">Stooge Sort</option>
+            <option value="quick">Quick Sort</option>
+            <option value="merge">Merge Sort</option>
+        </select>
+
+
+            <button id="generar">
+                Generar datos
+            </button>
+
+            <button id="iniciar">
+                Iniciar
+            </button>
+
+            <button id="reiniciar">
+                Reiniciar
+            </button>
+
+        </section>
+
+
+        <!-- Control de velocidad -->
+        <section class="velocidad">
+
+            <label for="velocidad">
+                Velocidad:
+            </label>
+
+            <input
+                type="range"
+                id="velocidad"
+                min="1"
+                max="10"
+                value="5"
+            >
+
+        </section>
+
+
+        <!-- Área donde aparecerán las barras -->
+        <section class="visualizacion">
+
+            <h2>Visualización</h2>
+
+            <div id="contenedor-barras">
+
+                <!--
+                    Las barras del arreglo
+                    serán creadas mediante JavaScript.
+                -->
+
+            </div>
+
+        </section>
+
+
+        <!-- Información del algoritmo -->
+        <section class="informacion">
+
+            <h2>Información del algoritmo</h2>
+
+            <p>
+                <strong>Algoritmo:</strong>
+                <span id="nombre-algoritmo">Bubble Sort</span>
+            </p>
+
+            <p>
+                <strong>Complejidad:</strong>
+                <span id="complejidad">O(n²)</span>
+            </p>
+
+            <p>
+                <strong>Comparaciones:</strong>
+                <span id="comparaciones">0</span>
+            </p>
+
+            <p>
+                <strong>Intercambios:</strong>
+                <span id="intercambios">0</span>
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <!-- Pie de página -->
+    <footer>
+
+        <p>
+            Skynet Algorithm Visualizer © 2026
+        </p>
+
+    </footer>
+
+
+    <script src="script.js"></script>
 
 </body>
 
