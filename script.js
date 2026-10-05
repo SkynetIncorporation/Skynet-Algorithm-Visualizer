@@ -465,6 +465,84 @@ async function stoogeSort(inicio = 0, fin = datos.length - 1) {
     }
 }
 
+async function quickSort(inicio = 0, fin = datos.length - 1) {
+    const esInicio = inicio === 0 && fin === datos.length - 1;
+
+    if (esInicio) {
+        ejecutando = true;
+    }
+
+    if (inicio >= fin) {
+        if (esInicio) {
+            posicionesOrdenadas = datos.map((valor, indice) => indice);
+            mostrarBarras();
+            ejecutando = false;
+        }
+        return;
+    }
+
+    const pivote = datos[Math.floor((inicio + fin) / 2)];
+    let izquierda = inicio;
+    let derecha = fin;
+
+    while (izquierda <= derecha) {
+        while (datos[izquierda] < pivote) {
+            izquierda++;
+        }
+
+        while (datos[derecha] > pivote) {
+            derecha--;
+        }
+
+        if (izquierda <= derecha) {
+            const barras = document.querySelectorAll(".barra");
+            barras[izquierda].classList.add("comparando");
+            barras[derecha].classList.add("comparando");
+            comparaciones++;
+            actualizarMetricas();
+
+            await esperar(velocidad);
+
+            if (izquierda < derecha) {
+                barras[izquierda].classList.remove("comparando");
+                barras[derecha].classList.remove("comparando");
+                barras[izquierda].classList.add("intercambiando");
+                barras[derecha].classList.add("intercambiando");
+                await esperar(velocidad);
+
+                const temporal = datos[izquierda];
+                datos[izquierda] = datos[derecha];
+                datos[derecha] = temporal;
+                intercambios++;
+                actualizarMetricas();
+                mostrarBarras();
+
+                await esperar(velocidad);
+            } else {
+                barras[izquierda].classList.remove("comparando");
+                barras[derecha].classList.remove("comparando");
+            }
+
+            izquierda++;
+            derecha--;
+        }
+    }
+
+    if (inicio < derecha) {
+        await quickSort(inicio, derecha);
+    }
+
+    if (izquierda < fin) {
+        await quickSort(izquierda, fin);
+    }
+
+    if (esInicio) {
+        posicionesOrdenadas = datos.map((valor, indice) => indice);
+        mostrarBarras();
+        ejecutando = false;
+    }
+}
+
 function reiniciar() {
 
     // No se puede reiniciar mientras el algoritmo esta en ejecucion
