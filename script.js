@@ -9,6 +9,7 @@ const botonReiniciar = document.getElementById("reiniciar");
 const controlVelocidad = document.getElementById("velocidad");
 const selectorAlgoritmo = document.getElementById("algoritmo");
 const nombreAlgoritmo = document.getElementById("nombre-algoritmo");
+const elementoTiempo = document.getElementById("tiempo-ejecucion");
 
 
 // ========================================
@@ -21,6 +22,7 @@ let datos = [];
 
 let comparaciones = 0;
 let intercambios = 0;
+let tiempoEjecucion = 0;
 
 let posicionesOrdenadas = [];
 
@@ -29,12 +31,43 @@ let velocidad = 300;
 
 
 // ========================================
+// DATOS PARA LA COMPARACIÓN DE TIEMPOS
+// ========================================
+
+const tiemposAlgoritmos = {
+
+    bubble: null,
+    selection: null,
+    insertion: null,
+    gnome: null,
+    exchange: null,
+    stooge: null,
+    quick: null,
+    merge: null
+
+};
+
+
+const nombresAlgoritmos = {
+
+    bubble: "Bubble Sort",
+    selection: "Selection Sort",
+    insertion: "Insertion Sort",
+    gnome: "Gnome Sort",
+    exchange: "Exchange Sort",
+    stooge: "Stooge Sort",
+    quick: "Quick Sort",
+    merge: "Merge Sort"
+
+};
+
+
+// ========================================
 // GENERAR DATOS
 // ========================================
 
 function generarDatos() {
 
-    // No genera datos nuevos mientras el algoritmo está en proceso
     if (ejecutando) {
         return;
     }
@@ -42,7 +75,6 @@ function generarDatos() {
     datos = [];
     posicionesOrdenadas = [];
 
-    // Genera números aleatorios
     for (let i = 0; i < cantidadElementos; i++) {
 
         const valor = Math.floor(Math.random() * 91) + 10;
@@ -50,13 +82,13 @@ function generarDatos() {
         datos.push(valor);
     }
 
-    // Reinicia métricas
     comparaciones = 0;
     intercambios = 0;
+    tiempoEjecucion = 0;
 
     actualizarMetricas();
+    actualizarTiempo();
 
-    // Muestra las barras
     mostrarBarras();
 }
 
@@ -67,36 +99,26 @@ function generarDatos() {
 
 function mostrarBarras() {
 
-    // Eliminamos las barras anteriores
     contenedorBarras.innerHTML = "";
 
-    // Recorremos el arreglo
     for (let i = 0; i < datos.length; i++) {
 
-        // Creamos una barra
         const barra = document.createElement("div");
 
-        // Le asignamos la clase barra
         barra.classList.add("barra");
 
-        // La altura representa el valor
         barra.style.height = datos[i] + "%";
 
-        // Mostramos el valor
         barra.textContent = datos[i];
 
-        // Guardamos el valor
         barra.dataset.valor = datos[i];
 
-        // Guardamos la posición
         barra.dataset.indice = i;
 
-        // Si la posición ya está ordenada
         if (posicionesOrdenadas.includes(i)) {
             barra.classList.add("ordenada");
         }
 
-        // Agregamos la barra
         contenedorBarras.appendChild(barra);
     }
 }
@@ -108,9 +130,26 @@ function mostrarBarras() {
 
 function actualizarMetricas() {
 
-    document.getElementById("comparaciones").textContent = comparaciones;
+    document.getElementById("comparaciones").textContent =
+        comparaciones;
 
-    document.getElementById("intercambios").textContent = intercambios;
+    document.getElementById("intercambios").textContent =
+        intercambios;
+}
+
+
+// ========================================
+// ACTUALIZAR TIEMPO
+// ========================================
+
+function actualizarTiempo() {
+
+    if (elementoTiempo) {
+
+        elementoTiempo.textContent =
+            tiempoEjecucion.toFixed(3) + " ms";
+
+    }
 }
 
 
@@ -139,7 +178,10 @@ function actualizarVelocidad() {
     velocidad = 600 - (valor * 50);
 }
 
-controlVelocidad.addEventListener("input", actualizarVelocidad);
+controlVelocidad.addEventListener(
+    "input",
+    actualizarVelocidad
+);
 
 actualizarVelocidad();
 
@@ -151,9 +193,12 @@ actualizarVelocidad();
 function actualizarNombreAlgoritmo() {
 
     const opcion =
-        selectorAlgoritmo.options[selectorAlgoritmo.selectedIndex];
+        selectorAlgoritmo.options[
+            selectorAlgoritmo.selectedIndex
+        ];
 
-    nombreAlgoritmo.textContent = opcion.textContent;
+    nombreAlgoritmo.textContent =
+        opcion.textContent;
 
     actualizarComplejidad();
 }
@@ -226,7 +271,8 @@ async function bubbleSort() {
 
         for (let j = 0; j < datos.length - 1 - i; j++) {
 
-            const barras = document.querySelectorAll(".barra");
+            const barras =
+                document.querySelectorAll(".barra");
 
             barras[j].classList.add("comparando");
             barras[j + 1].classList.add("comparando");
@@ -264,10 +310,13 @@ async function bubbleSort() {
 
                 barras[j].classList.remove("comparando");
                 barras[j + 1].classList.remove("comparando");
+
             }
         }
 
-        posicionesOrdenadas.push(datos.length - 1 - i);
+        posicionesOrdenadas.push(
+            datos.length - 1 - i
+        );
 
         mostrarBarras();
 
@@ -296,7 +345,8 @@ async function selectionSort() {
 
         for (let j = i + 1; j < datos.length; j++) {
 
-            const barras = document.querySelectorAll(".barra");
+            const barras =
+                document.querySelectorAll(".barra");
 
             barras[indiceMinimo].classList.add("comparando");
             barras[j].classList.add("comparando");
@@ -318,7 +368,8 @@ async function selectionSort() {
 
         if (indiceMinimo !== i) {
 
-            const barras = document.querySelectorAll(".barra");
+            const barras =
+                document.querySelectorAll(".barra");
 
             barras[i].classList.add("intercambiando");
             barras[indiceMinimo].classList.add("intercambiando");
@@ -346,7 +397,9 @@ async function selectionSort() {
         await esperar(velocidad);
     }
 
-    posicionesOrdenadas.push(datos.length - 1);
+    posicionesOrdenadas.push(
+        datos.length - 1
+    );
 
     mostrarBarras();
 
@@ -368,7 +421,8 @@ async function insertionSort() {
 
         while (j > 0) {
 
-            const barras = document.querySelectorAll(".barra");
+            const barras =
+                document.querySelectorAll(".barra");
 
             barras[j - 1].classList.add("comparando");
             barras[j].classList.add("comparando");
@@ -418,7 +472,9 @@ async function insertionSort() {
 
     if (datos.length > 0) {
 
-        posicionesOrdenadas.push(datos.length - 1);
+        posicionesOrdenadas.push(
+            datos.length - 1
+        );
 
         mostrarBarras();
     }
@@ -443,7 +499,8 @@ async function gnomeSort() {
             indice = 1;
         }
 
-        const barras = document.querySelectorAll(".barra");
+        const barras =
+            document.querySelectorAll(".barra");
 
         barras[indice - 1].classList.add("comparando");
         barras[indice].classList.add("comparando");
@@ -510,7 +567,8 @@ async function exchangeSort() {
 
         for (let j = i + 1; j < datos.length; j++) {
 
-            const barras = document.querySelectorAll(".barra");
+            const barras =
+                document.querySelectorAll(".barra");
 
             barras[i].classList.add("comparando");
             barras[j].classList.add("comparando");
@@ -548,6 +606,7 @@ async function exchangeSort() {
 
                 barras[i].classList.remove("comparando");
                 barras[j].classList.remove("comparando");
+
             }
         }
 
@@ -558,7 +617,9 @@ async function exchangeSort() {
 
     if (datos.length > 0) {
 
-        posicionesOrdenadas.push(datos.length - 1);
+        posicionesOrdenadas.push(
+            datos.length - 1
+        );
 
         mostrarBarras();
     }
@@ -600,7 +661,8 @@ async function stoogeSort(
         return;
     }
 
-    const barras = document.querySelectorAll(".barra");
+    const barras =
+        document.querySelectorAll(".barra");
 
     barras[inicio].classList.add("comparando");
     barras[fin].classList.add("comparando");
@@ -638,6 +700,7 @@ async function stoogeSort(
 
         barras[inicio].classList.remove("comparando");
         barras[fin].classList.remove("comparando");
+
     }
 
     const tercio =
@@ -761,6 +824,7 @@ async function quickSort(
 
                 barras[izquierda].classList.remove("comparando");
                 barras[derecha].classList.remove("comparando");
+
             }
 
             izquierda++;
@@ -815,7 +879,6 @@ async function mergeSort(
     }
 
     if (inicio >= fin) {
-
         return;
     }
 
@@ -872,22 +935,21 @@ async function mergeSort(
             document.querySelectorAll(".barra");
 
 
-        // Resaltamos las barras que estamos comparando
-        barras[posicionIzquierda].classList.add("comparando");
-        barras[posicionDerecha].classList.add("comparando");
+        barras[posicionIzquierda].classList.add(
+            "comparando"
+        );
 
+        barras[posicionDerecha].classList.add(
+            "comparando"
+        );
 
-        // Aumentamos el contador
         comparaciones++;
 
         actualizarMetricas();
 
-
-        // Esperamos para mostrar la comparación
         await esperar(velocidad);
 
 
-        // Comparamos los valores
         if (
             valoresIzquierda[indiceIzquierda] <=
             valoresDerecha[indiceDerecha]
@@ -909,9 +971,13 @@ async function mergeSort(
         }
 
 
-        // Quitamos el color de comparación
-        barras[posicionIzquierda].classList.remove("comparando");
-        barras[posicionDerecha].classList.remove("comparando");
+        barras[posicionIzquierda].classList.remove(
+            "comparando"
+        );
+
+        barras[posicionDerecha].classList.remove(
+            "comparando"
+        );
     }
 
 
@@ -944,7 +1010,7 @@ async function mergeSort(
 
 
     // ========================================
-    // COLOCAR LOS ELEMENTOS ORDENADOS
+    // COLOCAR ELEMENTOS ORDENADOS
     // ========================================
 
     for (
@@ -960,13 +1026,11 @@ async function mergeSort(
             document.querySelectorAll(".barra");
 
 
-        // Si el valor cambia
         if (
             datos[posicion] !==
             valoresOrdenados[indice]
         ) {
 
-            // Mostramos que el elemento se está colocando
             barras[posicion].classList.add(
                 "intercambiando"
             );
@@ -974,18 +1038,13 @@ async function mergeSort(
             await esperar(velocidad);
 
 
-            // Colocamos el nuevo valor
             datos[posicion] =
                 valoresOrdenados[indice];
 
-
-            // Aumentamos el contador
             intercambios++;
 
             actualizarMetricas();
 
-
-            // Actualizamos las barras
             mostrarBarras();
 
             await esperar(velocidad);
@@ -1032,6 +1091,249 @@ async function mergeSort(
 }
 
 
+// ========================================
+// EJECUTAR ALGORITMO Y MEDIR TIEMPO
+// ========================================
+
+async function ejecutarConTiempo(algoritmo) {
+
+    if (ejecutando) {
+        return;
+    }
+
+    comparaciones = 0;
+    intercambios = 0;
+    tiempoEjecucion = 0;
+
+    posicionesOrdenadas = [];
+
+    actualizarMetricas();
+    actualizarTiempo();
+
+    const inicio = performance.now();
+
+
+    if (algoritmo === "bubble") {
+        await bubbleSort();
+    }
+
+    if (algoritmo === "selection") {
+        await selectionSort();
+    }
+
+    if (algoritmo === "insertion") {
+        await insertionSort();
+    }
+
+    if (algoritmo === "gnome") {
+        await gnomeSort();
+    }
+
+    if (algoritmo === "exchange") {
+        await exchangeSort();
+    }
+
+    if (algoritmo === "stooge") {
+        await stoogeSort();
+    }
+
+    if (algoritmo === "quick") {
+        await quickSort();
+    }
+
+    if (algoritmo === "merge") {
+        await mergeSort();
+    }
+
+
+    const fin = performance.now();
+
+    tiempoEjecucion =
+        fin - inicio;
+
+
+    tiemposAlgoritmos[algoritmo] =
+        tiempoEjecucion;
+
+    actualizarTiempo();
+
+    actualizarGrafica();
+}
+
+
+// ========================================
+// ACTUALIZAR GRÁFICA
+// ========================================
+
+function actualizarGrafica() {
+
+    const canvas =
+        document.getElementById("grafica-tiempos");
+
+    if (!canvas) {
+        return;
+    }
+
+    const contexto =
+        canvas.getContext("2d");
+
+    const ancho =
+        canvas.clientWidth || 800;
+
+    const alto =
+        canvas.clientHeight || 400;
+
+    canvas.width = ancho;
+    canvas.height = alto;
+
+    contexto.clearRect(
+        0,
+        0,
+        ancho,
+        alto
+    );
+
+
+    const resultados =
+        Object.entries(tiemposAlgoritmos)
+            .filter(
+                ([algoritmo, tiempo]) =>
+                    tiempo !== null
+            );
+
+
+    if (resultados.length === 0) {
+
+        contexto.font =
+            "16px Arial";
+
+        contexto.textAlign =
+            "center";
+
+        contexto.fillText(
+            "Ejecuta un algoritmo para mostrar resultados",
+            ancho / 2,
+            alto / 2
+        );
+
+        return;
+    }
+
+
+    const margenIzquierdo = 70;
+    const margenDerecho = 30;
+    const margenSuperior = 30;
+    const margenInferior = 70;
+
+    const anchoGrafica =
+        ancho -
+        margenIzquierdo -
+        margenDerecho;
+
+    const altoGrafica =
+        alto -
+        margenSuperior -
+        margenInferior;
+
+
+    const tiempoMaximo =
+        Math.max(
+            ...resultados.map(
+                ([algoritmo, tiempo]) =>
+                    tiempo
+            )
+        );
+
+
+    const espacioBarra =
+        anchoGrafica /
+        resultados.length;
+
+    const anchoBarra =
+        espacioBarra * 0.6;
+
+
+    resultados.forEach(
+        ([algoritmo, tiempo], indice) => {
+
+            const alturaBarra =
+                tiempoMaximo === 0
+                    ? 0
+                    : (tiempo / tiempoMaximo) *
+                      altoGrafica;
+
+            const x =
+                margenIzquierdo +
+                indice * espacioBarra +
+                (espacioBarra - anchoBarra) / 2;
+
+            const y =
+                margenSuperior +
+                altoGrafica -
+                alturaBarra;
+
+
+            contexto.fillStyle =
+                "#4a90e2";
+
+            contexto.fillRect(
+                x,
+                y,
+                anchoBarra,
+                alturaBarra
+            );
+
+
+            contexto.fillStyle =
+                "#000";
+
+            contexto.font =
+                "12px Arial";
+
+            contexto.textAlign =
+                "center";
+
+
+            contexto.fillText(
+                nombresAlgoritmos[algoritmo],
+                x + anchoBarra / 2,
+                alto - 35
+            );
+
+
+            contexto.fillText(
+                tiempo.toFixed(3) + " ms",
+                x + anchoBarra / 2,
+                y - 8
+            );
+        }
+    );
+
+
+    contexto.strokeStyle =
+        "#000";
+
+    contexto.lineWidth = 1;
+
+    contexto.beginPath();
+
+    contexto.moveTo(
+        margenIzquierdo,
+        margenSuperior
+    );
+
+    contexto.lineTo(
+        margenIzquierdo,
+        margenSuperior + altoGrafica
+    );
+
+    contexto.lineTo(
+        ancho - margenDerecho,
+        margenSuperior + altoGrafica
+    );
+
+    contexto.stroke();
+}
 
 
 // ========================================
@@ -1050,8 +1352,16 @@ function reiniciar() {
 
     comparaciones = 0;
     intercambios = 0;
+    tiempoEjecucion = 0;
+
+    for (const algoritmo in tiemposAlgoritmos) {
+
+        tiemposAlgoritmos[algoritmo] = null;
+    }
 
     actualizarMetricas();
+    actualizarTiempo();
+    actualizarGrafica();
 
     generarDatos();
 }
@@ -1092,37 +1402,7 @@ botonIniciar.addEventListener(
         const algoritmo =
             selectorAlgoritmo.value;
 
-        if (algoritmo === "bubble") {
-            bubbleSort();
-        }
-
-        if (algoritmo === "selection") {
-            selectionSort();
-        }
-
-        if (algoritmo === "insertion") {
-            insertionSort();
-        }
-
-        if (algoritmo === "gnome") {
-            gnomeSort();
-        }
-
-        if (algoritmo === "exchange") {
-            exchangeSort();
-        }
-
-        if (algoritmo === "stooge") {
-            stoogeSort();
-        }
-
-        if (algoritmo === "quick") {
-            quickSort();
-        }
-
-        if (algoritmo === "merge") {
-            mergeSort();
-        }
+        ejecutarConTiempo(algoritmo);
     }
 );
 
@@ -1132,3 +1412,10 @@ botonIniciar.addEventListener(
 // ========================================
 
 generarDatos();
+
+
+// ========================================
+// MOSTRAR GRÁFICA INICIAL
+// ========================================
+
+actualizarGrafica();
