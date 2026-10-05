@@ -215,6 +215,110 @@ async function bubbleSort() {
     ejecutando = false;
 }
 
+
+
+// ========================================
+// SELECTION SORT
+// ========================================
+
+async function selectionSort() {
+
+    // Indicamos que el algoritmo está ejecutándose
+    ejecutando = true;
+
+    // Recorremos el arreglo
+    for (let i = 0; i < datos.length - 1; i++) {
+
+        // Suponemos que el elemento actual
+        // es el menor
+        let posicionMenor = i;
+
+        // Buscamos un elemento menor
+        for (let j = i + 1; j < datos.length; j++) {
+
+            // Obtenemos las barras
+            const barras = document.querySelectorAll(".barra");
+
+            // Resaltamos los elementos que estamos comparando
+            barras[posicionMenor].classList.add("comparando");
+            barras[j].classList.add("comparando");
+
+            // Aumentamos las comparaciones
+            comparaciones++;
+
+            actualizarMetricas();
+
+            // Esperamos para visualizar la comparación
+            await esperar(velocidad);
+
+            // Comparamos los valores
+            if (datos[j] < datos[posicionMenor]) {
+
+                // Quitamos el color anterior
+                barras[posicionMenor].classList.remove("comparando");
+                barras[j].classList.remove("comparando");
+
+                // El nuevo menor es j
+                posicionMenor = j;
+
+            } else {
+
+                // Quitamos el color
+                barras[posicionMenor].classList.remove("comparando");
+                barras[j].classList.remove("comparando");
+            }
+        }
+
+        // Si encontramos un elemento menor,
+        // hacemos el intercambio
+        if (posicionMenor !== i) {
+
+            const barras = document.querySelectorAll(".barra");
+
+            // Resaltamos los elementos que vamos a intercambiar
+            barras[i].classList.add("intercambiando");
+            barras[posicionMenor].classList.add("intercambiando");
+
+            await esperar(velocidad);
+
+            // Intercambiamos los valores
+            const temporal = datos[i];
+
+            datos[i] = datos[posicionMenor];
+
+            datos[posicionMenor] = temporal;
+
+            // Aumentamos los intercambios
+            intercambios++;
+
+            actualizarMetricas();
+
+            // Actualizamos las barras
+            mostrarBarras();
+
+            await esperar(velocidad);
+        }
+
+        // La posición actual ya quedó ordenada
+        posicionesOrdenadas.push(i);
+
+        // Mostramos la posición como ordenada
+        mostrarBarras();
+
+        await esperar(velocidad);
+    }
+
+    // La última posición también queda ordenada
+    posicionesOrdenadas.push(datos.length - 1);
+
+    mostrarBarras();
+
+    // Terminamos la ejecución
+    ejecutando = false;
+}
+
+
+
 function reiniciar() {
 
     // No se puede reiniciar mientras el algoritmo esta en ejecucion
@@ -253,6 +357,9 @@ botonIniciar.addEventListener("click", function() {
     if(algoritmo === "bubble"){
         bubbleSort();
     }
+    if (algoritmo === "selection") {
+    selectionSort();
+}
 
 });
 
