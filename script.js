@@ -17,6 +17,7 @@ let datos = [];
 
 let comparaciones = 0;
 let intercambios = 0;
+let tiempoEjecucion = 0;
 
 let posicionesOrdenadas = [];
 
