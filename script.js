@@ -148,7 +148,7 @@ actualizarVelocidad();
 
 
 // ========================================
-// ACTUALIZAR NOMBRE DEL ALGORITMO
+// ACTUALIZAR INFORMACIÓN DEL ALGORITMO
 // ========================================
 
 function actualizarNombreAlgoritmo() {
@@ -157,7 +157,57 @@ function actualizarNombreAlgoritmo() {
         selectorAlgoritmo.options[selectorAlgoritmo.selectedIndex];
 
     nombreAlgoritmo.textContent = opcion.textContent;
+
+    actualizarComplejidad();
 }
+
+
+// ========================================
+// ACTUALIZAR COMPLEJIDAD
+// ========================================
+
+function actualizarComplejidad() {
+
+    const algoritmo = selectorAlgoritmo.value;
+
+    let complejidad = "";
+
+    if (algoritmo === "bubble") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "selection") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "insertion") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "gnome") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "exchange") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "stooge") {
+        complejidad = "O(n²·⁷⁰⁹)";
+    }
+
+    if (algoritmo === "quick") {
+        complejidad = "O(n log n)";
+    }
+
+    if (algoritmo === "merge") {
+        complejidad = "O(n log n)";
+    }
+
+    document.getElementById("complejidad").textContent =
+        complejidad;
+}
+
 
 selectorAlgoritmo.addEventListener(
     "change",
@@ -773,32 +823,30 @@ async function mergeSort(
 
     if (inicio >= fin) {
 
-        if (esInicio) {
-
-            posicionesOrdenadas = datos.map(
-                (valor, indice) => indice
-            );
-
-            mostrarBarras();
-
-            ejecutando = false;
-        }
-
         return;
     }
 
     const medio =
         Math.floor((inicio + fin) / 2);
 
+
+    // Ordenamos la mitad izquierda
     await mergeSort(
         inicio,
         medio
     );
 
+
+    // Ordenamos la mitad derecha
     await mergeSort(
         medio + 1,
         fin
     );
+
+
+    // ========================================
+    // FUSIONAR LAS DOS MITADES
+    // ========================================
 
     const valoresIzquierda =
         datos.slice(inicio, medio + 1);
@@ -810,6 +858,11 @@ async function mergeSort(
 
     let indiceIzquierda = 0;
     let indiceDerecha = 0;
+
+
+    // ========================================
+    // COMPARAR ELEMENTOS
+    // ========================================
 
     while (
         indiceIzquierda < valoresIzquierda.length &&
@@ -825,15 +878,23 @@ async function mergeSort(
         const barras =
             document.querySelectorAll(".barra");
 
+
+        // Resaltamos las barras que estamos comparando
         barras[posicionIzquierda].classList.add("comparando");
         barras[posicionDerecha].classList.add("comparando");
 
+
+        // Aumentamos el contador
         comparaciones++;
 
         actualizarMetricas();
 
+
+        // Esperamos para mostrar la comparación
         await esperar(velocidad);
 
+
+        // Comparamos los valores
         if (
             valoresIzquierda[indiceIzquierda] <=
             valoresDerecha[indiceDerecha]
@@ -854,12 +915,16 @@ async function mergeSort(
             indiceDerecha++;
         }
 
-        barras[posicionIzquierda]
-            .classList.remove("comparando");
 
-        barras[posicionDerecha]
-            .classList.remove("comparando");
+        // Quitamos el color de comparación
+        barras[posicionIzquierda].classList.remove("comparando");
+        barras[posicionDerecha].classList.remove("comparando");
     }
+
+
+    // ========================================
+    // AGREGAR ELEMENTOS RESTANTES
+    // ========================================
 
     while (
         indiceIzquierda < valoresIzquierda.length
@@ -872,6 +937,7 @@ async function mergeSort(
         indiceIzquierda++;
     }
 
+
     while (
         indiceDerecha < valoresDerecha.length
     ) {
@@ -883,40 +949,82 @@ async function mergeSort(
         indiceDerecha++;
     }
 
+
+    // ========================================
+    // COLOCAR LOS ELEMENTOS ORDENADOS
+    // ========================================
+
     for (
         let indice = 0;
         indice < valoresOrdenados.length;
         indice++
     ) {
 
-        const posicion = inicio + indice;
+        const posicion =
+            inicio + indice;
 
+        const barras =
+            document.querySelectorAll(".barra");
+
+
+        // Si el valor cambia
         if (
             datos[posicion] !==
             valoresOrdenados[indice]
         ) {
 
-            const barras =
-                document.querySelectorAll(".barra");
-
+            // Mostramos que el elemento se está colocando
             barras[posicion].classList.add(
                 "intercambiando"
             );
 
             await esperar(velocidad);
 
+
+            // Colocamos el nuevo valor
             datos[posicion] =
                 valoresOrdenados[indice];
 
+
+            // Aumentamos el contador
             intercambios++;
 
             actualizarMetricas();
 
+
+            // Actualizamos las barras
             mostrarBarras();
 
             await esperar(velocidad);
         }
     }
+
+
+    // ========================================
+    // MARCAR SEGMENTO ORDENADO
+    // ========================================
+
+    for (
+        let i = inicio;
+        i <= fin;
+        i++
+    ) {
+
+        if (!posicionesOrdenadas.includes(i)) {
+
+            posicionesOrdenadas.push(i);
+        }
+    }
+
+
+    mostrarBarras();
+
+    await esperar(velocidad);
+
+
+    // ========================================
+    // TERMINAR MERGE SORT
+    // ========================================
 
     if (esInicio) {
 
