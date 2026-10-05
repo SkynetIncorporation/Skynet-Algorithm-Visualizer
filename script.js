@@ -543,6 +543,92 @@ async function quickSort(inicio = 0, fin = datos.length - 1) {
     }
 }
 
+async function mergeSort(inicio = 0, fin = datos.length - 1) {
+    const esInicio = inicio === 0 && fin === datos.length - 1;
+
+    if (esInicio) {
+        ejecutando = true;
+    }
+
+    if (inicio >= fin) {
+        if (esInicio) {
+            posicionesOrdenadas = datos.map((valor, indice) => indice);
+            mostrarBarras();
+            ejecutando = false;
+        }
+        return;
+    }
+
+    const medio = Math.floor((inicio + fin) / 2);
+
+    await mergeSort(inicio, medio);
+    await mergeSort(medio + 1, fin);
+
+    const valoresIzquierda = datos.slice(inicio, medio + 1);
+    const valoresDerecha = datos.slice(medio + 1, fin + 1);
+    const valoresOrdenados = [];
+    let indiceIzquierda = 0;
+    let indiceDerecha = 0;
+
+    while (indiceIzquierda < valoresIzquierda.length &&
+           indiceDerecha < valoresDerecha.length) {
+        const posicionIzquierda = inicio + indiceIzquierda;
+        const posicionDerecha = medio + 1 + indiceDerecha;
+        const barras = document.querySelectorAll(".barra");
+
+        barras[posicionIzquierda].classList.add("comparando");
+        barras[posicionDerecha].classList.add("comparando");
+        comparaciones++;
+        actualizarMetricas();
+
+        await esperar(velocidad);
+
+        if (valoresIzquierda[indiceIzquierda] <= valoresDerecha[indiceDerecha]) {
+            valoresOrdenados.push(valoresIzquierda[indiceIzquierda]);
+            indiceIzquierda++;
+        } else {
+            valoresOrdenados.push(valoresDerecha[indiceDerecha]);
+            indiceDerecha++;
+        }
+
+        barras[posicionIzquierda].classList.remove("comparando");
+        barras[posicionDerecha].classList.remove("comparando");
+    }
+
+    while (indiceIzquierda < valoresIzquierda.length) {
+        valoresOrdenados.push(valoresIzquierda[indiceIzquierda]);
+        indiceIzquierda++;
+    }
+
+    while (indiceDerecha < valoresDerecha.length) {
+        valoresOrdenados.push(valoresDerecha[indiceDerecha]);
+        indiceDerecha++;
+    }
+
+    for (let indice = 0; indice < valoresOrdenados.length; indice++) {
+        const posicion = inicio + indice;
+
+        if (datos[posicion] !== valoresOrdenados[indice]) {
+            const barras = document.querySelectorAll(".barra");
+            barras[posicion].classList.add("intercambiando");
+            await esperar(velocidad);
+
+            datos[posicion] = valoresOrdenados[indice];
+            intercambios++;
+            actualizarMetricas();
+            mostrarBarras();
+
+            await esperar(velocidad);
+        }
+    }
+
+    if (esInicio) {
+        posicionesOrdenadas = datos.map((valor, indice) => indice);
+        mostrarBarras();
+        ejecutando = false;
+    }
+}
+
 function reiniciar() {
 
     // No se puede reiniciar mientras el algoritmo esta en ejecucion
