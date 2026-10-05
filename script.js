@@ -676,6 +676,10 @@ botonIniciar.addEventListener("click", function() {
         insertionSort();
     }
 
+    if(algoritmo === "gnome"){
+        gnomeSort();
+    }
+
 });
 
 
