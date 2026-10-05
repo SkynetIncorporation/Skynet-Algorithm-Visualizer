@@ -668,6 +668,10 @@ botonIniciar.addEventListener("click", function() {
         bubbleSort();
     }
 
+    if(algoritmo === "selection"){
+        selectionSort();
+    }
+
 });
 
 
