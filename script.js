@@ -692,6 +692,10 @@ botonIniciar.addEventListener("click", function() {
         quickSort();
     }
 
+    if(algoritmo === "merge"){
+        mergeSort();
+    }
+
 });
 
 
