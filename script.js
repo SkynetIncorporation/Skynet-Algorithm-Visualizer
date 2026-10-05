@@ -688,6 +688,10 @@ botonIniciar.addEventListener("click", function() {
         stoogeSort();
     }
 
+    if(algoritmo === "quick"){
+        quickSort();
+    }
+
 });
 
 
