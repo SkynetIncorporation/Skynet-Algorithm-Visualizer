@@ -1,4 +1,6 @@
-// Elementos de la interfaz
+// ========================================
+// ELEMENTOS DE LA INTERFAZ
+// ========================================
 
 const contenedorBarras = document.getElementById("contenedor-barras");
 const botonGenerar = document.getElementById("generar");
@@ -8,15 +10,18 @@ const controlVelocidad = document.getElementById("velocidad");
 const selectorAlgoritmo = document.getElementById("algoritmo");
 const nombreAlgoritmo = document.getElementById("nombre-algoritmo");
 
-// Configuracion
+
+// ========================================
+// CONFIGURACIÓN
+// ========================================
 
 const cantidadElementos = 20;
-
 
 let datos = [];
 
 let comparaciones = 0;
 let intercambios = 0;
+let tiempoEjecucion = 0;
 
 let posicionesOrdenadas = [];
 
@@ -50,19 +55,21 @@ let ejecutando = false;
 let velocidad = 300;
 
 
-
+// ========================================
+// GENERAR DATOS
+// ========================================
 
 function generarDatos() {
 
-    // No genera datos nuevos mientras el algoritmo esta en proceso
+    // No genera datos nuevos mientras el algoritmo está en proceso
     if (ejecutando) {
         return;
     }
 
     datos = [];
-    posicionesOrdenadas=[];
+    posicionesOrdenadas = [];
 
-    // Genera numeros aleatorios
+    // Genera números aleatorios
     for (let i = 0; i < cantidadElementos; i++) {
 
         const valor = Math.floor(Math.random() * 91) + 10;
@@ -70,16 +77,19 @@ function generarDatos() {
         datos.push(valor);
     }
 
-    // Reinicio metricas
+    // Reinicia métricas
     comparaciones = 0;
     intercambios = 0;
+    tiempoEjecucion = 0;
 
     actualizarMetricas();
 
-    // Mostramos las barras
+    // Muestra las barras
     mostrarBarras();
 }
 
+
+// Mostrar barras
 
 function mostrarBarras() {
 
@@ -104,11 +114,12 @@ function mostrarBarras() {
         // Guardamos el valor
         barra.dataset.valor = datos[i];
 
-        // Guardamos también la posicion
+        // Guardamos la posición
         barra.dataset.indice = i;
 
-        if(posicionesOrdenadas.includes(i)){
-            barra.classList.add("ordenada")
+        // Si la posición ya está ordenada
+        if (posicionesOrdenadas.includes(i)) {
+            barra.classList.add("ordenada");
         }
 
         // Agregamos la barra
@@ -117,12 +128,18 @@ function mostrarBarras() {
 }
 
 
+// ========================================
+// ACTUALIZAR MÉTRICAS
+// ========================================
 
 function actualizarMetricas() {
 
     document.getElementById("comparaciones").textContent = comparaciones;
 
     document.getElementById("intercambios").textContent = intercambios;
+
+    document.getElementById("tiempo-ejecucion").textContent =
+        tiempoEjecucion.toFixed(4) + " ms";
 }
 function actualizarTiempo()
 { const elementoTiempo = document.getElementById("tiempo-ejecucion"); if (elementoTiempo)
@@ -130,6 +147,9 @@ function actualizarTiempo()
     } 
  }
 
+// ========================================
+// ESPERAR
+// ========================================
 
 function esperar(tiempo) {
 
@@ -260,52 +280,114 @@ const canvas = document.getElementById("grafica-tiempos");
 
 function actualizarVelocidad(){
     const valor = Number(controlVelocidad.value);
-    velocidad = 600 - (valor*50);
+
+    velocidad = 600 - (valor * 50);
 }
 
 controlVelocidad.addEventListener("input", actualizarVelocidad);
+
 actualizarVelocidad();
 
 
+// ========================================
+// ACTUALIZAR INFORMACIÓN DEL ALGORITMO
+// ========================================
 
-function actualizarNombreAlgoritmo(){
-    const opcion = selectorAlgoritmo.options[selectorAlgoritmo.selectedIndex];
+function actualizarNombreAlgoritmo() {
+
+    const opcion =
+        selectorAlgoritmo.options[selectorAlgoritmo.selectedIndex];
+
     nombreAlgoritmo.textContent = opcion.textContent;
+
+    actualizarComplejidad();
 }
-selectorAlgoritmo.addEventListener("change", actualizarNombreAlgoritmo);
+
+
+// ========================================
+// ACTUALIZAR COMPLEJIDAD
+// ========================================
+
+function actualizarComplejidad() {
+
+    const algoritmo = selectorAlgoritmo.value;
+
+    let complejidad = "";
+
+    if (algoritmo === "bubble") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "selection") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "insertion") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "gnome") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "exchange") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "stooge") {
+        complejidad = "O(n²·⁷⁰⁹)";
+    }
+
+    if (algoritmo === "quick") {
+        complejidad = "O(n log n)";
+    }
+
+    if (algoritmo === "merge") {
+        complejidad = "O(n log n)";
+    }
+
+    document.getElementById("complejidad").textContent =
+        complejidad;
+}
+
+
+selectorAlgoritmo.addEventListener(
+    "change",
+    actualizarNombreAlgoritmo
+);
+
 actualizarNombreAlgoritmo();
+
+
+// ========================================
+// BUBBLE SORT
+// ========================================
 
 async function bubbleSort() {
 
+// Bubble Sort
+
+async function bubbleSort() {
 
     ejecutando = true;
 
-    // Recorremos el arreglo
     for (let i = 0; i < datos.length - 1; i++) {
 
-        // Comparamos los elementos
         for (let j = 0; j < datos.length - 1 - i; j++) {
 
-            // Obtenemos todas las barras
             const barras = document.querySelectorAll(".barra");
 
-            // Resaltamos las dos barras que estamos comparando
             barras[j].classList.add("comparando");
             barras[j + 1].classList.add("comparando");
 
-            // Aumentamos el contador
             comparaciones++;
 
             actualizarMetricas();
 
-            // Esperamos para poder ver la comparacion
             await esperar(velocidad);
 
-
-            // Comparamos los valores
             if (datos[j] > datos[j + 1]) {
 
-                // Cambiamos el color para indicar intercambio
                 barras[j].classList.remove("comparando");
                 barras[j + 1].classList.remove("comparando");
 
@@ -314,72 +396,68 @@ async function bubbleSort() {
 
                 await esperar(velocidad);
 
-
-                // Intercambiamos los valores
                 const temporal = datos[j];
 
                 datos[j] = datos[j + 1];
-
                 datos[j + 1] = temporal;
 
-
-                // Aumentamos el contador
                 intercambios++;
 
                 actualizarMetricas();
 
-
-                // Actualizamos las barras
                 mostrarBarras();
-
 
                 await esperar(velocidad);
 
             } else {
 
-                // Quitamos el color de comparacion
                 barras[j].classList.remove("comparando");
                 barras[j + 1].classList.remove("comparando");
-
             }
         }
 
-        // Obtenemos las barras actualizadas
-        const barras = document.querySelectorAll(".barra");
+        posicionesOrdenadas.push(datos.length - 1 - i);
 
-        // Marcamos como ordenada la ultima posicion
-        posicionesOrdenadas.push(datos.length -1 -i);
         mostrarBarras();
 
         await esperar(velocidad);
     }
 
-
-    // Marcamos la primera posicion como ordenada
     posicionesOrdenadas.push(0);
-    mostrarBarras();
 
+    mostrarBarras();
 
     ejecutando = false;
 }
 
+
+// ========================================
+// SELECTION SORT
+// ========================================
+
 async function selectionSort() {
+
     ejecutando = true;
 
     for (let i = 0; i < datos.length - 1; i++) {
+
         let indiceMinimo = i;
 
         for (let j = i + 1; j < datos.length; j++) {
+
             const barras = document.querySelectorAll(".barra");
 
             barras[indiceMinimo].classList.add("comparando");
             barras[j].classList.add("comparando");
+
             comparaciones++;
+
             actualizarMetricas();
 
             await esperar(velocidad);
 
             if (datos[j] < datos[indiceMinimo]) {
+
                 indiceMinimo = j;
             }
 
@@ -388,252 +466,401 @@ async function selectionSort() {
         }
 
         if (indiceMinimo !== i) {
+
             const barras = document.querySelectorAll(".barra");
 
             barras[i].classList.add("intercambiando");
             barras[indiceMinimo].classList.add("intercambiando");
+
             await esperar(velocidad);
 
             const temporal = datos[i];
+
             datos[i] = datos[indiceMinimo];
             datos[indiceMinimo] = temporal;
+
             intercambios++;
+
             actualizarMetricas();
+
             mostrarBarras();
 
             await esperar(velocidad);
         }
 
         posicionesOrdenadas.push(i);
+
         mostrarBarras();
+
+        await esperar(velocidad);
     }
 
     posicionesOrdenadas.push(datos.length - 1);
+
     mostrarBarras();
+
     ejecutando = false;
 }
 
+
+// ========================================
+// INSERTION SORT
+// ========================================
+
 async function insertionSort() {
+
     ejecutando = true;
 
     for (let i = 1; i < datos.length; i++) {
+
         let j = i;
 
         while (j > 0) {
+
             const barras = document.querySelectorAll(".barra");
 
             barras[j - 1].classList.add("comparando");
             barras[j].classList.add("comparando");
+
             comparaciones++;
+
             actualizarMetricas();
 
             await esperar(velocidad);
 
             if (datos[j - 1] <= datos[j]) {
+
                 barras[j - 1].classList.remove("comparando");
                 barras[j].classList.remove("comparando");
+
                 break;
             }
 
             barras[j - 1].classList.remove("comparando");
             barras[j].classList.remove("comparando");
+
             barras[j - 1].classList.add("intercambiando");
             barras[j].classList.add("intercambiando");
+
             await esperar(velocidad);
 
             const temporal = datos[j - 1];
+
             datos[j - 1] = datos[j];
             datos[j] = temporal;
+
             intercambios++;
+
             actualizarMetricas();
+
             mostrarBarras();
 
             await esperar(velocidad);
+
             j--;
         }
 
         posicionesOrdenadas.push(i);
+
         mostrarBarras();
     }
 
     if (datos.length > 0) {
+
         posicionesOrdenadas.push(datos.length - 1);
+
         mostrarBarras();
     }
 
     ejecutando = false;
 }
 
+
+// ========================================
+// GNOME SORT
+// ========================================
+
 async function gnomeSort() {
+
     ejecutando = true;
+
     let indice = 1;
 
     while (indice < datos.length) {
+
         if (indice === 0) {
             indice = 1;
         }
 
         const barras = document.querySelectorAll(".barra");
+
         barras[indice - 1].classList.add("comparando");
         barras[indice].classList.add("comparando");
+
         comparaciones++;
+
         actualizarMetricas();
 
         await esperar(velocidad);
 
         if (datos[indice - 1] <= datos[indice]) {
+
             barras[indice - 1].classList.remove("comparando");
             barras[indice].classList.remove("comparando");
+
             indice++;
+
             continue;
         }
 
         barras[indice - 1].classList.remove("comparando");
         barras[indice].classList.remove("comparando");
+
         barras[indice - 1].classList.add("intercambiando");
         barras[indice].classList.add("intercambiando");
+
         await esperar(velocidad);
 
         const temporal = datos[indice - 1];
+
         datos[indice - 1] = datos[indice];
         datos[indice] = temporal;
+
         intercambios++;
+
         actualizarMetricas();
+
         mostrarBarras();
 
         await esperar(velocidad);
+
         indice--;
     }
 
-    posicionesOrdenadas = datos.map((valor, indiceActual) => indiceActual);
+    posicionesOrdenadas = datos.map(
+        (valor, indiceActual) => indiceActual
+    );
+
     mostrarBarras();
+
     ejecutando = false;
 }
 
+
+// ========================================
+// EXCHANGE SORT
+// ========================================
+
 async function exchangeSort() {
+
     ejecutando = true;
 
     for (let i = 0; i < datos.length - 1; i++) {
+
         for (let j = i + 1; j < datos.length; j++) {
+
             const barras = document.querySelectorAll(".barra");
+
             barras[i].classList.add("comparando");
             barras[j].classList.add("comparando");
+
             comparaciones++;
+
             actualizarMetricas();
 
             await esperar(velocidad);
 
             if (datos[i] > datos[j]) {
+
                 barras[i].classList.remove("comparando");
                 barras[j].classList.remove("comparando");
+
                 barras[i].classList.add("intercambiando");
                 barras[j].classList.add("intercambiando");
+
                 await esperar(velocidad);
 
                 const temporal = datos[i];
+
                 datos[i] = datos[j];
                 datos[j] = temporal;
+
                 intercambios++;
+
                 actualizarMetricas();
+
                 mostrarBarras();
 
                 await esperar(velocidad);
+
             } else {
+
                 barras[i].classList.remove("comparando");
                 barras[j].classList.remove("comparando");
             }
         }
 
         posicionesOrdenadas.push(i);
+
         mostrarBarras();
     }
 
     if (datos.length > 0) {
+
         posicionesOrdenadas.push(datos.length - 1);
+
         mostrarBarras();
     }
 
     ejecutando = false;
 }
 
-async function stoogeSort(inicio = 0, fin = datos.length - 1) {
-    const esInicio = inicio === 0 && fin === datos.length - 1;
+
+// ========================================
+// STOOGE SORT
+// ========================================
+
+async function stoogeSort(
+    inicio = 0,
+    fin = datos.length - 1
+) {
+
+    const esInicio =
+        inicio === 0 &&
+        fin === datos.length - 1;
 
     if (esInicio) {
         ejecutando = true;
     }
 
     if (inicio >= fin) {
+
         if (esInicio) {
-            posicionesOrdenadas = datos.map((valor, indice) => indice);
+
+            posicionesOrdenadas = datos.map(
+                (valor, indice) => indice
+            );
+
             mostrarBarras();
+
             ejecutando = false;
         }
+
         return;
     }
 
     const barras = document.querySelectorAll(".barra");
+
     barras[inicio].classList.add("comparando");
     barras[fin].classList.add("comparando");
+
     comparaciones++;
+
     actualizarMetricas();
 
     await esperar(velocidad);
 
     if (datos[inicio] > datos[fin]) {
+
         barras[inicio].classList.remove("comparando");
         barras[fin].classList.remove("comparando");
+
         barras[inicio].classList.add("intercambiando");
         barras[fin].classList.add("intercambiando");
+
         await esperar(velocidad);
 
         const temporal = datos[inicio];
+
         datos[inicio] = datos[fin];
         datos[fin] = temporal;
+
         intercambios++;
+
         actualizarMetricas();
+
         mostrarBarras();
 
         await esperar(velocidad);
+
     } else {
+
         barras[inicio].classList.remove("comparando");
         barras[fin].classList.remove("comparando");
     }
 
-    const tercio = Math.floor((fin - inicio + 1) / 3);
+    const tercio =
+        Math.floor((fin - inicio + 1) / 3);
 
-    await stoogeSort(inicio, fin - tercio);
-    await stoogeSort(inicio + tercio, fin);
-    await stoogeSort(inicio, fin - tercio);
+    await stoogeSort(
+        inicio,
+        fin - tercio
+    );
+
+    await stoogeSort(
+        inicio + tercio,
+        fin
+    );
+
+    await stoogeSort(
+        inicio,
+        fin - tercio
+    );
 
     if (esInicio) {
-        posicionesOrdenadas = datos.map((valor, indice) => indice);
+
+        posicionesOrdenadas = datos.map(
+            (valor, indice) => indice
+        );
+
         mostrarBarras();
+
         ejecutando = false;
     }
 }
 
-async function quickSort(inicio = 0, fin = datos.length - 1) {
-    const esInicio = inicio === 0 && fin === datos.length - 1;
+
+// ========================================
+// QUICK SORT
+// ========================================
+
+async function quickSort(
+    inicio = 0,
+    fin = datos.length - 1
+) {
+
+    const esInicio =
+        inicio === 0 &&
+        fin === datos.length - 1;
 
     if (esInicio) {
         ejecutando = true;
     }
 
     if (inicio >= fin) {
+
         if (esInicio) {
-            posicionesOrdenadas = datos.map((valor, indice) => indice);
+
+            posicionesOrdenadas = datos.map(
+                (valor, indice) => indice
+            );
+
             mostrarBarras();
+
             ejecutando = false;
         }
+
         return;
     }
 
-    const pivote = datos[Math.floor((inicio + fin) / 2)];
+    const pivote =
+        datos[Math.floor((inicio + fin) / 2)];
+
     let izquierda = inicio;
     let derecha = fin;
 
     while (izquierda <= derecha) {
+
         while (datos[izquierda] < pivote) {
             izquierda++;
         }
@@ -643,30 +870,44 @@ async function quickSort(inicio = 0, fin = datos.length - 1) {
         }
 
         if (izquierda <= derecha) {
-            const barras = document.querySelectorAll(".barra");
+
+            const barras =
+                document.querySelectorAll(".barra");
+
             barras[izquierda].classList.add("comparando");
             barras[derecha].classList.add("comparando");
+
             comparaciones++;
+
             actualizarMetricas();
 
             await esperar(velocidad);
 
             if (izquierda < derecha) {
+
                 barras[izquierda].classList.remove("comparando");
                 barras[derecha].classList.remove("comparando");
+
                 barras[izquierda].classList.add("intercambiando");
                 barras[derecha].classList.add("intercambiando");
+
                 await esperar(velocidad);
 
                 const temporal = datos[izquierda];
+
                 datos[izquierda] = datos[derecha];
                 datos[derecha] = temporal;
+
                 intercambios++;
+
                 actualizarMetricas();
+
                 mostrarBarras();
 
                 await esperar(velocidad);
+
             } else {
+
                 barras[izquierda].classList.remove("comparando");
                 barras[derecha].classList.remove("comparando");
             }
@@ -677,124 +918,248 @@ async function quickSort(inicio = 0, fin = datos.length - 1) {
     }
 
     if (inicio < derecha) {
-        await quickSort(inicio, derecha);
+
+        await quickSort(
+            inicio,
+            derecha
+        );
     }
 
     if (izquierda < fin) {
-        await quickSort(izquierda, fin);
+
+        await quickSort(
+            izquierda,
+            fin
+        );
     }
 
     if (esInicio) {
-        posicionesOrdenadas = datos.map((valor, indice) => indice);
+
+        posicionesOrdenadas = datos.map(
+            (valor, indice) => indice
+        );
+
         mostrarBarras();
+
         ejecutando = false;
     }
 }
 
-async function mergeSort(inicio = 0, fin = datos.length - 1) {
-    const esInicio = inicio === 0 && fin === datos.length - 1;
+
+// ========================================
+// MERGE SORT
+// ========================================
+
+async function mergeSort(
+    inicio = 0,
+    fin = datos.length - 1
+) {
+
+    const esInicio =
+        inicio === 0 &&
+        fin === datos.length - 1;
 
     if (esInicio) {
         ejecutando = true;
     }
 
     if (inicio >= fin) {
-        if (esInicio) {
-            posicionesOrdenadas = datos.map((valor, indice) => indice);
-            mostrarBarras();
-            ejecutando = false;
-        }
+
         return;
     }
 
-    const medio = Math.floor((inicio + fin) / 2);
+    const medio =
+        Math.floor((inicio + fin) / 2);
 
-    await mergeSort(inicio, medio);
-    await mergeSort(medio + 1, fin);
 
-    const valoresIzquierda = datos.slice(inicio, medio + 1);
-    const valoresDerecha = datos.slice(medio + 1, fin + 1);
+    // Ordenamos la mitad izquierda
+    await mergeSort(
+        inicio,
+        medio
+    );
+
+
+    // Ordenamos la mitad derecha
+    await mergeSort(
+        medio + 1,
+        fin
+    );
+
+
+    // ========================================
+    // FUSIONAR LAS DOS MITADES
+    // ========================================
+
+    const valoresIzquierda =
+        datos.slice(inicio, medio + 1);
+
+    const valoresDerecha =
+        datos.slice(medio + 1, fin + 1);
+
     const valoresOrdenados = [];
+
     let indiceIzquierda = 0;
     let indiceDerecha = 0;
 
-    while (indiceIzquierda < valoresIzquierda.length &&
-           indiceDerecha < valoresDerecha.length) {
-        const posicionIzquierda = inicio + indiceIzquierda;
-        const posicionDerecha = medio + 1 + indiceDerecha;
-        const barras = document.querySelectorAll(".barra");
 
+    // ========================================
+    // COMPARAR ELEMENTOS
+    // ========================================
+
+    while (
+        indiceIzquierda < valoresIzquierda.length &&
+        indiceDerecha < valoresDerecha.length
+    ) {
+
+        const posicionIzquierda =
+            inicio + indiceIzquierda;
+
+        const posicionDerecha =
+            medio + 1 + indiceDerecha;
+
+        const barras =
+            document.querySelectorAll(".barra");
+
+
+        // Resaltamos las barras que estamos comparando
         barras[posicionIzquierda].classList.add("comparando");
         barras[posicionDerecha].classList.add("comparando");
+
+
+        // Aumentamos el contador
         comparaciones++;
+
         actualizarMetricas();
 
+
+        // Esperamos para mostrar la comparación
         await esperar(velocidad);
 
-        if (valoresIzquierda[indiceIzquierda] <= valoresDerecha[indiceDerecha]) {
-            valoresOrdenados.push(valoresIzquierda[indiceIzquierda]);
+
+        // Comparamos los valores
+        if (
+            valoresIzquierda[indiceIzquierda] <=
+            valoresDerecha[indiceDerecha]
+        ) {
+
+            valoresOrdenados.push(
+                valoresIzquierda[indiceIzquierda]
+            );
+
             indiceIzquierda++;
+
         } else {
-            valoresOrdenados.push(valoresDerecha[indiceDerecha]);
+
+            valoresOrdenados.push(
+                valoresDerecha[indiceDerecha]
+            );
+
             indiceDerecha++;
         }
 
+
+        // Quitamos el color de comparación
         barras[posicionIzquierda].classList.remove("comparando");
         barras[posicionDerecha].classList.remove("comparando");
     }
 
-    while (indiceIzquierda < valoresIzquierda.length) {
-        valoresOrdenados.push(valoresIzquierda[indiceIzquierda]);
+
+    // ========================================
+    // AGREGAR ELEMENTOS RESTANTES
+    // ========================================
+
+    while (
+        indiceIzquierda < valoresIzquierda.length
+    ) {
+
+        valoresOrdenados.push(
+            valoresIzquierda[indiceIzquierda]
+        );
+
         indiceIzquierda++;
     }
 
-    while (indiceDerecha < valoresDerecha.length) {
-        valoresOrdenados.push(valoresDerecha[indiceDerecha]);
+
+    while (
+        indiceDerecha < valoresDerecha.length
+    ) {
+
+        valoresOrdenados.push(
+            valoresDerecha[indiceDerecha]
+        );
+
         indiceDerecha++;
     }
 
-    for (let indice = 0; indice < valoresOrdenados.length; indice++) {
-        const posicion = inicio + indice;
 
-        if (datos[posicion] !== valoresOrdenados[indice]) {
-            const barras = document.querySelectorAll(".barra");
-            barras[posicion].classList.add("intercambiando");
+    // ========================================
+    // COLOCAR LOS ELEMENTOS ORDENADOS
+    // ========================================
+
+    for (
+        let indice = 0;
+        indice < valoresOrdenados.length;
+        indice++
+    ) {
+
+        const posicion =
+            inicio + indice;
+
+        const barras =
+            document.querySelectorAll(".barra");
+
+
+        // Si el valor cambia
+        if (
+            datos[posicion] !==
+            valoresOrdenados[indice]
+        ) {
+
+            // Mostramos que el elemento se está colocando
+            barras[posicion].classList.add(
+                "intercambiando"
+            );
+
             await esperar(velocidad);
 
-            datos[posicion] = valoresOrdenados[indice];
+
+            // Colocamos el nuevo valor
+            datos[posicion] =
+                valoresOrdenados[indice];
+
+
+            // Aumentamos el contador
             intercambios++;
+
             actualizarMetricas();
+
+
+            // Actualizamos las barras
             mostrarBarras();
 
             await esperar(velocidad);
         }
     }
 
-    if (esInicio) {
-        posicionesOrdenadas = datos.map((valor, indice) => indice);
-        mostrarBarras();
-        ejecutando = false;
+
+    // ========================================
+    // MARCAR SEGMENTO ORDENADO
+    // ========================================
+
+    for (
+        let i = inicio;
+        i <= fin;
+        i++
+    ) {
+
+        if (!posicionesOrdenadas.includes(i)) {
+
+            posicionesOrdenadas.push(i);
+        }
     }
-}
 
-function reiniciar() {
 
-    // No se puede reiniciar mientras el algoritmo esta en ejecucion
-    if (ejecutando) {
-        return;
-    }
-
-    // Eliminamos los datos actuales
-    datos = [];
-
-    // Eliminamos las posiciones ordenadas
-    posicionesOrdenadas = [];
-
-    // Reinicio metricas
-    comparaciones = 0;
-    intercambios = 0;
-
-    actualizarMetricas();
+    mostrarBarras();
 
 // Reiniciar tiempos
 tiempoEjecucion = 0;
@@ -809,11 +1174,23 @@ actualizarGrafica();
 
 
 
-    generarDatos();
+
+    // ========================================
+    // TERMINAR MERGE SORT
+    // ========================================
+
+    if (esInicio) {
+
+        posicionesOrdenadas = datos.map(
+            (valor, indice) => indice
+        );
+
+        mostrarBarras();
+
+        ejecutando = false;
+    }
 }
 
-botonGenerar.addEventListener("click", generarDatos);
-botonReiniciar.addEventListener("click", reiniciar);
 
 async function ejecutarConTiempo(algoritmo) {
 
@@ -830,6 +1207,7 @@ async function ejecutarConTiempo(algoritmo) {
     if (algoritmo === "insertion") {
         await insertionSort();
     }
+}
 
     if (algoritmo === "gnome") {
         await gnomeSort();
@@ -876,6 +1254,9 @@ botonIniciar.addEventListener("click", function() {
 });
 
 
+// ========================================
+// GENERAR DATOS AL ABRIR
+// ========================================
 
 
 generarDatos();
