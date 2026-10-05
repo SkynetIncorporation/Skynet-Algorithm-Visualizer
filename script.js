@@ -684,6 +684,10 @@ botonIniciar.addEventListener("click", function() {
         exchangeSort();
     }
 
+    if(algoritmo === "stooge"){
+        stoogeSort();
+    }
+
 });
 
 
