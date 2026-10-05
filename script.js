@@ -265,6 +265,57 @@ async function selectionSort() {
     ejecutando = false;
 }
 
+async function insertionSort() {
+    ejecutando = true;
+
+    for (let i = 1; i < datos.length; i++) {
+        let j = i;
+
+        while (j > 0) {
+            const barras = document.querySelectorAll(".barra");
+
+            barras[j - 1].classList.add("comparando");
+            barras[j].classList.add("comparando");
+            comparaciones++;
+            actualizarMetricas();
+
+            await esperar(velocidad);
+
+            if (datos[j - 1] <= datos[j]) {
+                barras[j - 1].classList.remove("comparando");
+                barras[j].classList.remove("comparando");
+                break;
+            }
+
+            barras[j - 1].classList.remove("comparando");
+            barras[j].classList.remove("comparando");
+            barras[j - 1].classList.add("intercambiando");
+            barras[j].classList.add("intercambiando");
+            await esperar(velocidad);
+
+            const temporal = datos[j - 1];
+            datos[j - 1] = datos[j];
+            datos[j] = temporal;
+            intercambios++;
+            actualizarMetricas();
+            mostrarBarras();
+
+            await esperar(velocidad);
+            j--;
+        }
+
+        posicionesOrdenadas.push(i);
+        mostrarBarras();
+    }
+
+    if (datos.length > 0) {
+        posicionesOrdenadas.push(datos.length - 1);
+        mostrarBarras();
+    }
+
+    ejecutando = false;
+}
+
 function reiniciar() {
 
     // No se puede reiniciar mientras el algoritmo esta en ejecucion
