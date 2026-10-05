@@ -672,6 +672,10 @@ botonIniciar.addEventListener("click", function() {
         selectionSort();
     }
 
+    if(algoritmo === "insertion"){
+        insertionSort();
+    }
+
 });
 
 
