@@ -680,6 +680,10 @@ botonIniciar.addEventListener("click", function() {
         gnomeSort();
     }
 
+    if(algoritmo === "exchange"){
+        exchangeSort();
+    }
+
 });
 
 
