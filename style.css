@@ -1,236 +1,494 @@
- {
+```css
+* {
     box-sizing: border-box;
 }
+
 
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+
     background: #0f172a;
     color: #e2e8f0;
 }
 
+
+/* ========================================
+   ENCABEZADO
+======================================== */
+
 header {
     text-align: center;
+
     padding: 35px 20px;
+
     background: #111827;
+
     border-bottom: 2px solid #334155;
 }
 
+
 header h1 {
     margin: 0 0 10px;
+
     font-size: 2.2rem;
+
     color: #38bdf8;
 }
 
+
 header p {
     margin: 0;
+
     color: #94a3b8;
+
     font-size: 1rem;
 }
+
+
+/* ========================================
+   CONTENIDO PRINCIPAL
+======================================== */
 
 main {
     width: 90%;
     max-width: 1100px;
+
     margin: 30px auto;
 }
 
 
+/* ========================================
+   CONTROLES
+======================================== */
+
 .controles {
     display: flex;
+
     align-items: center;
     justify-content: center;
+
     flex-wrap: wrap;
+
     gap: 12px;
+
     padding: 20px;
+
     background: #1e293b;
+
     border: 1px solid #334155;
+
     border-radius: 12px;
+
     margin-bottom: 20px;
 }
+
 
 .controles label {
     font-weight: bold;
 }
 
+
+/* ========================================
+   SELECTOR
+======================================== */
+
 #algoritmo {
     padding: 10px 12px;
+
     border-radius: 6px;
+
     border: 1px solid #475569;
+
     background: #0f172a;
+
     color: #e2e8f0;
+
     cursor: pointer;
 }
 
 
+/* ========================================
+   BOTONES
+======================================== */
 
 button {
     padding: 10px 16px;
+
     border: none;
+
     border-radius: 6px;
+
     background: #2563eb;
+
     color: white;
+
     font-weight: bold;
+
     cursor: pointer;
+
     transition: 0.2s;
 }
 
+
 button:hover {
     background: #1d4ed8;
+
     transform: translateY(-1px);
 }
+
 
 button:active {
     transform: translateY(0);
 }
 
 
-
+/* ========================================
+   VELOCIDAD
+======================================== */
 
 .velocidad {
     display: flex;
+
     align-items: center;
     justify-content: center;
+
     gap: 12px;
+
     padding: 15px;
+
     background: #1e293b;
+
     border: 1px solid #334155;
+
     border-radius: 12px;
+
     margin-bottom: 20px;
 }
 
+
 #velocidad {
     width: 220px;
+
     cursor: pointer;
 }
 
 
-
+/* ========================================
+   VISUALIZACIÓN
+======================================== */
 
 .visualizacion {
     padding: 20px;
+
     background: #1e293b;
+
     border: 1px solid #334155;
+
     border-radius: 12px;
+
     margin-bottom: 20px;
 }
 
+
 .visualizacion h2 {
     margin-top: 0;
+
     text-align: center;
+
     color: #38bdf8;
 }
 
+
+/* ========================================
+   CONTENEDOR DE BARRAS
+======================================== */
+
 #contenedor-barras {
-    min-height: 300px;
+
+    /* IMPORTANTE:
+       Ahora tiene una altura real.
+       Las barras usarán esta altura
+       para calcular sus porcentajes.
+    */
+
+    width: 100%;
+
+    height: 400px;
+
+    min-height: 400px;
+
     display: flex;
+
     align-items: flex-end;
+
     justify-content: center;
-    gap: 5px;
+
+    gap: 8px;
+
     padding: 20px;
+
     border: 1px solid #475569;
+
     border-radius: 8px;
+
     background: #0f172a;
+
     overflow-x: auto;
+
+    overflow-y: hidden;
 }
 
 
+/* ========================================
+   BARRAS
+======================================== */
 
 .barra {
+
+    /* Ancho de cada barra */
+
     width: 30px;
+
     min-width: 30px;
+
+    /*
+
+       IMPORTANTE:
+
+       NO poner height aquí.
+
+       JavaScript se encarga de poner:
+
+       barra.style.height = datos[i] + "%";
+
+    */
+
     background-color: #38bdf8;
 
     display: flex;
+
     align-items: flex-start;
+
     justify-content: center;
 
     color: white;
+
     font-size: 12px;
+
     font-weight: bold;
 
     border-radius: 4px 4px 0 0;
-    transition: height 0.2s, background-color 0.2s;
+
+    transition:
+        height 0.2s ease,
+        background-color 0.2s ease;
+
+    /* Evita problemas con el contenido */
+
+    flex-shrink: 0;
 }
 
 
+/* ========================================
+   BARRA COMPARANDO
+======================================== */
 
 .barra.comparando {
+
     background-color: orange;
 }
 
+
+/* ========================================
+   BARRA INTERCAMBIANDO
+======================================== */
+
 .barra.intercambiando {
+
     background-color: red;
 }
 
+
+/* ========================================
+   BARRA ORDENADA
+======================================== */
+
 .barra.ordenada {
+
     background-color: green;
 }
 
 
+/* ========================================
+   INFORMACIÓN
+======================================== */
+
 .informacion {
+
     padding: 20px;
+
     background: #1e293b;
+
     border: 1px solid #334155;
+
     border-radius: 12px;
 }
 
+
 .informacion h2 {
+
     margin-top: 0;
+
     color: #38bdf8;
 }
 
+
 .informacion p {
+
     margin: 10px 0;
+
     padding: 10px;
+
     background: #0f172a;
+
     border-radius: 6px;
 }
 
+
 .informacion strong {
+
     color: #94a3b8;
 }
 
 
-footer {
-    text-align: center;
-    padding: 25px;
+/* ========================================
+   GRÁFICA
+======================================== */
+
+.grafica-seccion {
+
     margin-top: 30px;
+
+    padding: 20px;
+
+    background: #1e293b;
+
+    border: 1px solid #334155;
+
+    border-radius: 12px;
+}
+
+
+.grafica-seccion h2 {
+
+    margin-top: 0;
+
+    text-align: center;
+
+    color: #38bdf8;
+}
+
+
+#grafica-tiempos {
+
+    width: 100%;
+
+    max-width: 1000px;
+
+    height: 400px;
+
+    display: block;
+
+    margin: 20px auto;
+
+    border: 1px solid #475569;
+
+    border-radius: 8px;
+
+    background: white;
+}
+
+
+/* ========================================
+   PIE DE PÁGINA
+======================================== */
+
+footer {
+
+    text-align: center;
+
+    padding: 25px;
+
+    margin-top: 30px;
+
     background: #111827;
+
     border-top: 2px solid #334155;
+
     color: #64748b;
 }
 
 
+/* ========================================
+   RESPONSIVE
+======================================== */
 
 @media (max-width: 700px) {
 
     header h1 {
+
         font-size: 1.7rem;
     }
 
+
     main {
+
         width: 95%;
     }
 
+
     .controles {
+
         flex-direction: column;
     }
+
 
     #algoritmo,
     button {
+
         width: 100%;
     }
 
+
     .velocidad {
+
         flex-direction: column;
     }
 
+
     #velocidad {
+
         width: 100%;
     }
 
+
     #contenedor-barras {
+
         justify-content: flex-start;
+
+        height: 350px;
+
+        min-height: 350px;
+    }
+
+
+    .barra {
+
+        width: 25px;
+
+        min-width: 25px;
     }
 }
+```

@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 
@@ -32,8 +31,13 @@
 
     <!-- Encabezado principal -->
     <header>
+
         <h1>Skynet Algorithm Visualizer</h1>
-        <p>Visualizador de algoritmos de ordenamiento</p>
+
+        <p>
+            Visualizador de algoritmos de ordenamiento
+        </p>
+
     </header>
 
 
@@ -47,14 +51,39 @@
             </label>
 
             <select id="algoritmo">
-                <option value="bubble">Bubble Sort</option>
-                <option value="selection">Selection Sort</option>
-                <option value="insertion">Insertion Sort</option>
-                <option value="gnome">Gnome Sort</option>
-                <option value="exchange">Exchange Sort</option>
-                <option value="stooge">Stooge Sort</option>
-                <option value="quick">Quick Sort</option>
-                <option value="merge">Merge Sort</option>
+
+                <option value="bubble">
+                    Bubble Sort
+                </option>
+
+                <option value="selection">
+                    Selection Sort
+                </option>
+
+                <option value="insertion">
+                    Insertion Sort
+                </option>
+
+                <option value="gnome">
+                    Gnome Sort
+                </option>
+
+                <option value="exchange">
+                    Exchange Sort
+                </option>
+
+                <option value="stooge">
+                    Stooge Sort
+                </option>
+
+                <option value="quick">
+                    Quick Sort
+                </option>
+
+                <option value="merge">
+                    Merge Sort
+                </option>
+
             </select>
 
 
@@ -62,9 +91,11 @@
                 Generar datos
             </button>
 
+
             <button id="iniciar">
                 Iniciar
             </button>
+
 
             <button id="reiniciar">
                 Reiniciar
@@ -94,7 +125,9 @@
         <!-- Área donde aparecerán las barras -->
         <section class="visualizacion">
 
-            <h2>Visualización</h2>
+            <h2>
+                Visualización
+            </h2>
 
             <div id="contenedor-barras">
 
@@ -111,35 +144,73 @@
         <!-- Información del algoritmo -->
         <section class="informacion">
 
-            <h2>Información del algoritmo</h2>
+            <h2>
+                Información del algoritmo
+            </h2>
+
 
             <p>
-                <strong>Algoritmo:</strong>
-                <span id="nombre-algoritmo">Bubble Sort</span>
+
+                <strong>
+                    Algoritmo:
+                </strong>
+
+                <span id="nombre-algoritmo">
+                    Bubble Sort
+                </span>
+
             </p>
 
-            <p>
-                <strong>Complejidad:</strong>
-                <span id="complejidad">O(n²)</span>
-            </p>
 
             <p>
-                <strong>Comparaciones:</strong>
-                <span id="comparaciones">0</span>
+
+                <strong>
+                    Complejidad:
+                </strong>
+
+                <span id="complejidad">
+                    O(n²)
+                </span>
+
             </p>
 
-            <p>
-                <strong>Intercambios:</strong>
-                <span id="intercambios">0</span>
-            </p>
-            <p>
-    <strong>Tiempo de ejecución:</strong>
-    <span id="tiempo-ejecucion">0 ms</span>
-</p>
 
             <p>
-                <strong>Tiempo de ejecución:</strong>
-                <span id="tiempo-ejecucion">0 ms</span>
+
+                <strong>
+                    Comparaciones:
+                </strong>
+
+                <span id="comparaciones">
+                    0
+                </span>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Intercambios:
+                </strong>
+
+                <span id="intercambios">
+                    0
+                </span>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Tiempo de ejecución:
+                </strong>
+
+                <span id="tiempo-ejecucion">
+                    0 ms
+                </span>
+
             </p>
 
         </section>
@@ -148,31 +219,9 @@
         <!-- Gráfica comparativa -->
         <section class="grafica-seccion">
 
-            <h2>Comparación de tiempos de ejecución</h2>
-
-            <canvas id="grafica-tiempos"></canvas>
-
-            <p>
-                <strong>Tiempo de ejecución:</strong>
-                <span id="tiempo-ejecucion">0 ms</span>
-            </p>
-
-        </section>
-
-
-        <!-- Gráfica comparativa -->
-        <section class="grafica-seccion">
-
-            <h2>Comparación de tiempos de ejecución</h2>
-
-            <canvas id="grafica-tiempos"></canvas>
-
-        </section>
-
-        <!-- Gráfica comparativa de tiempos -->
-        <section class="grafica-seccion">
-
-            <h2>Comparación de tiempos de ejecución</h2>
+            <h2>
+                Comparación de tiempos de ejecución
+            </h2>
 
             <canvas id="grafica-tiempos"></canvas>
 
@@ -197,4 +246,3 @@
 </body>
 
 </html>
-

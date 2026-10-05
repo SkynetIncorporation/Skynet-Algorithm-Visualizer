@@ -1,15 +1,31 @@
+
 // ========================================
 // ELEMENTOS DE LA INTERFAZ
 // ========================================
 
-const contenedorBarras = document.getElementById("contenedor-barras");
-const botonGenerar = document.getElementById("generar");
-const botonIniciar = document.getElementById("iniciar");
-const botonReiniciar = document.getElementById("reiniciar");
-const controlVelocidad = document.getElementById("velocidad");
-const selectorAlgoritmo = document.getElementById("algoritmo");
-const nombreAlgoritmo = document.getElementById("nombre-algoritmo");
-const elementoTiempo = document.getElementById("tiempo-ejecucion");
+const contenedorBarras =
+    document.getElementById("contenedor-barras");
+
+const botonGenerar =
+    document.getElementById("generar");
+
+const botonIniciar =
+    document.getElementById("iniciar");
+
+const botonReiniciar =
+    document.getElementById("reiniciar");
+
+const controlVelocidad =
+    document.getElementById("velocidad");
+
+const selectorAlgoritmo =
+    document.getElementById("algoritmo");
+
+const nombreAlgoritmo =
+    document.getElementById("nombre-algoritmo");
+
+const elementoTiempo =
+    document.getElementById("tiempo-ejecucion");
 
 
 // ========================================
@@ -22,12 +38,19 @@ let datos = [];
 
 let comparaciones = 0;
 let intercambios = 0;
+
 let tiempoEjecucion = 0;
 
 let posicionesOrdenadas = [];
 
+let ejecutando = false;
 
-// Datos para la comparación de tiempos
+let velocidad = 300;
+
+
+// ========================================
+// TIEMPOS DE LOS ALGORITMOS
+// ========================================
 
 const tiemposAlgoritmos = {
 
@@ -41,6 +64,11 @@ const tiemposAlgoritmos = {
     merge: null
 
 };
+
+
+// ========================================
+// NOMBRES DE LOS ALGORITMOS
+// ========================================
 
 const nombresAlgoritmos = {
 
@@ -56,10 +84,6 @@ const nombresAlgoritmos = {
 };
 
 
-let ejecutando = false;
-let velocidad = 300;
-
-
 // ========================================
 // GENERAR DATOS
 // ========================================
@@ -71,9 +95,14 @@ function generarDatos() {
     }
 
     datos = [];
+
     posicionesOrdenadas = [];
 
-    for (let i = 0; i < cantidadElementos; i++) {
+    for (
+        let i = 0;
+        i < cantidadElementos;
+        i++
+    ) {
 
         const valor =
             Math.floor(Math.random() * 91) + 10;
@@ -82,16 +111,14 @@ function generarDatos() {
     }
 
     comparaciones = 0;
+
     intercambios = 0;
+
     tiempoEjecucion = 0;
 
-    for (const algoritmo in tiemposAlgoritmos) {
-        tiemposAlgoritmos[algoritmo] = null;
-    }
-
     actualizarMetricas();
+
     actualizarTiempo();
-    actualizarGrafica();
 
     mostrarBarras();
 }
@@ -105,13 +132,18 @@ function mostrarBarras() {
 
     contenedorBarras.innerHTML = "";
 
-    for (let i = 0; i < datos.length; i++) {
+    for (
+        let i = 0;
+        i < datos.length;
+        i++
+    ) {
 
         const barra =
             document.createElement("div");
 
         barra.classList.add("barra");
 
+        // La altura depende del valor
         barra.style.height =
             datos[i] + "%";
 
@@ -124,10 +156,11 @@ function mostrarBarras() {
         barra.dataset.indice =
             i;
 
-        if (posicionesOrdenadas.includes(i)) {
+        if (
+            posicionesOrdenadas.includes(i)
+        ) {
 
             barra.classList.add("ordenada");
-
         }
 
         contenedorBarras.appendChild(barra);
@@ -141,11 +174,13 @@ function mostrarBarras() {
 
 function actualizarMetricas() {
 
-    document.getElementById("comparaciones").textContent =
-        comparaciones;
+    document.getElementById(
+        "comparaciones"
+    ).textContent = comparaciones;
 
-    document.getElementById("intercambios").textContent =
-        intercambios;
+    document.getElementById(
+        "intercambios"
+    ).textContent = intercambios;
 }
 
 
@@ -158,8 +193,8 @@ function actualizarTiempo() {
     if (elementoTiempo) {
 
         elementoTiempo.textContent =
-            tiempoEjecucion.toFixed(3) + " ms";
-
+            tiempoEjecucion.toFixed(3) +
+            " ms";
     }
 }
 
@@ -170,16 +205,14 @@ function actualizarTiempo() {
 
 function esperar(tiempo) {
 
-    return new Promise(resolve => {
-
-        setTimeout(resolve, tiempo);
-
-    });
+    return new Promise(
+        resolve => setTimeout(resolve, tiempo)
+    );
 }
 
 
 // ========================================
-// ACTUALIZAR VELOCIDAD
+// VELOCIDAD
 // ========================================
 
 function actualizarVelocidad() {
@@ -201,7 +234,7 @@ actualizarVelocidad();
 
 
 // ========================================
-// ACTUALIZAR INFORMACIÓN DEL ALGORITMO
+// ACTUALIZAR NOMBRE
 // ========================================
 
 function actualizarNombreAlgoritmo() {
@@ -219,7 +252,7 @@ function actualizarNombreAlgoritmo() {
 
 
 // ========================================
-// ACTUALIZAR COMPLEJIDAD
+// COMPLEJIDAD
 // ========================================
 
 function actualizarComplejidad() {
@@ -261,8 +294,14 @@ function actualizarComplejidad() {
         complejidad = "O(n log n)";
     }
 
-    document.getElementById("complejidad").textContent =
-        complejidad;
+    const elemento =
+        document.getElementById("complejidad");
+
+    if (elemento) {
+
+        elemento.textContent =
+            complejidad;
+    }
 }
 
 
@@ -297,8 +336,13 @@ async function bubbleSort() {
             const barras =
                 document.querySelectorAll(".barra");
 
-            barras[j].classList.add("comparando");
-            barras[j + 1].classList.add("comparando");
+            barras[j].classList.add(
+                "comparando"
+            );
+
+            barras[j + 1].classList.add(
+                "comparando"
+            );
 
             comparaciones++;
 
@@ -306,7 +350,9 @@ async function bubbleSort() {
 
             await esperar(velocidad);
 
-            if (datos[j] > datos[j + 1]) {
+            if (
+                datos[j] > datos[j + 1]
+            ) {
 
                 barras[j].classList.remove(
                     "comparando"
@@ -352,7 +398,6 @@ async function bubbleSort() {
                 barras[j + 1].classList.remove(
                     "comparando"
                 );
-
             }
         }
 
@@ -429,7 +474,9 @@ async function selectionSort() {
             );
         }
 
-        if (indiceMinimo !== i) {
+        if (
+            indiceMinimo !== i
+        ) {
 
             const barras =
                 document.querySelectorAll(".barra");
@@ -515,8 +562,7 @@ async function insertionSort() {
             await esperar(velocidad);
 
             if (
-                datos[j - 1] <=
-                datos[j]
+                datos[j - 1] <= datos[j]
             ) {
 
                 barras[j - 1].classList.remove(
@@ -567,20 +613,14 @@ async function insertionSort() {
 
             j--;
         }
-
-        posicionesOrdenadas.push(i);
-
-        mostrarBarras();
     }
 
-    if (datos.length > 0) {
-
-        posicionesOrdenadas.push(
-            datos.length - 1
+    posicionesOrdenadas =
+        datos.map(
+            (valor, indice) => indice
         );
 
-        mostrarBarras();
-    }
+    mostrarBarras();
 
     ejecutando = false;
 }
@@ -596,7 +636,9 @@ async function gnomeSort() {
 
     let indice = 1;
 
-    while (indice < datos.length) {
+    while (
+        indice < datos.length
+    ) {
 
         if (indice === 0) {
             indice = 1;
@@ -675,10 +717,11 @@ async function gnomeSort() {
         indice--;
     }
 
-    posicionesOrdenadas = datos.map(
-        (valor, indiceActual) =>
-            indiceActual
-    );
+    posicionesOrdenadas =
+        datos.map(
+            (valor, indiceActual) =>
+                indiceActual
+        );
 
     mostrarBarras();
 
@@ -723,7 +766,9 @@ async function exchangeSort() {
 
             await esperar(velocidad);
 
-            if (datos[i] > datos[j]) {
+            if (
+                datos[i] > datos[j]
+            ) {
 
                 barras[i].classList.remove(
                     "comparando"
@@ -777,14 +822,11 @@ async function exchangeSort() {
         mostrarBarras();
     }
 
-    if (datos.length > 0) {
+    posicionesOrdenadas.push(
+        datos.length - 1
+    );
 
-        posicionesOrdenadas.push(
-            datos.length - 1
-        );
-
-        mostrarBarras();
-    }
+    mostrarBarras();
 
     ejecutando = false;
 }
@@ -809,18 +851,6 @@ async function stoogeSort(
 
     if (inicio >= fin) {
 
-        if (esInicio) {
-
-            posicionesOrdenadas = datos.map(
-                (valor, indice) =>
-                    indice
-            );
-
-            mostrarBarras();
-
-            ejecutando = false;
-        }
-
         return;
     }
 
@@ -841,7 +871,10 @@ async function stoogeSort(
 
     await esperar(velocidad);
 
-    if (datos[inicio] > datos[fin]) {
+    if (
+        datos[inicio] >
+        datos[fin]
+    ) {
 
         barras[inicio].classList.remove(
             "comparando"
@@ -911,10 +944,10 @@ async function stoogeSort(
 
     if (esInicio) {
 
-        posicionesOrdenadas = datos.map(
-            (valor, indice) =>
-                indice
-        );
+        posicionesOrdenadas =
+            datos.map(
+                (valor, indice) => indice
+            );
 
         mostrarBarras();
 
@@ -942,18 +975,6 @@ async function quickSort(
 
     if (inicio >= fin) {
 
-        if (esInicio) {
-
-            posicionesOrdenadas = datos.map(
-                (valor, indice) =>
-                    indice
-            );
-
-            mostrarBarras();
-
-            ejecutando = false;
-        }
-
         return;
     }
 
@@ -965,23 +986,30 @@ async function quickSort(
         ];
 
     let izquierda = inicio;
+
     let derecha = fin;
 
-    while (izquierda <= derecha) {
+    while (
+        izquierda <= derecha
+    ) {
 
         while (
             datos[izquierda] < pivote
         ) {
+
             izquierda++;
         }
 
         while (
             datos[derecha] > pivote
         ) {
+
             derecha--;
         }
 
-        if (izquierda <= derecha) {
+        if (
+            izquierda <= derecha
+        ) {
 
             const barras =
                 document.querySelectorAll(".barra");
@@ -1000,7 +1028,9 @@ async function quickSort(
 
             await esperar(velocidad);
 
-            if (izquierda < derecha) {
+            if (
+                izquierda < derecha
+            ) {
 
                 barras[izquierda].classList.remove(
                     "comparando"
@@ -1049,11 +1079,14 @@ async function quickSort(
             }
 
             izquierda++;
+
             derecha--;
         }
     }
 
-    if (inicio < derecha) {
+    if (
+        inicio < derecha
+    ) {
 
         await quickSort(
             inicio,
@@ -1061,7 +1094,9 @@ async function quickSort(
         );
     }
 
-    if (izquierda < fin) {
+    if (
+        izquierda < fin
+    ) {
 
         await quickSort(
             izquierda,
@@ -1071,10 +1106,10 @@ async function quickSort(
 
     if (esInicio) {
 
-        posicionesOrdenadas = datos.map(
-            (valor, indice) =>
-                indice
-        );
+        posicionesOrdenadas =
+            datos.map(
+                (valor, indice) => indice
+            );
 
         mostrarBarras();
 
@@ -1109,26 +1144,15 @@ async function mergeSort(
             (inicio + fin) / 2
         );
 
-
-    // Ordenamos la mitad izquierda
-
     await mergeSort(
         inicio,
         medio
     );
 
-
-    // Ordenamos la mitad derecha
-
     await mergeSort(
         medio + 1,
         fin
     );
-
-
-    // ========================================
-    // FUSIONAR LAS DOS MITADES
-    // ========================================
 
     const valoresIzquierda =
         datos.slice(
@@ -1145,12 +1169,8 @@ async function mergeSort(
     const valoresOrdenados = [];
 
     let indiceIzquierda = 0;
+
     let indiceDerecha = 0;
-
-
-    // ========================================
-    // COMPARAR ELEMENTOS
-    // ========================================
 
     while (
         indiceIzquierda <
@@ -1160,21 +1180,26 @@ async function mergeSort(
     ) {
 
         const posicionIzquierda =
-            inicio + indiceIzquierda;
+            inicio +
+            indiceIzquierda;
 
         const posicionDerecha =
-            medio + 1 + indiceDerecha;
+            medio +
+            1 +
+            indiceDerecha;
 
         const barras =
             document.querySelectorAll(".barra");
 
-        barras[posicionIzquierda].classList.add(
-            "comparando"
-        );
+        barras[posicionIzquierda]
+            .classList.add(
+                "comparando"
+            );
 
-        barras[posicionDerecha].classList.add(
-            "comparando"
-        );
+        barras[posicionDerecha]
+            .classList.add(
+                "comparando"
+            );
 
         comparaciones++;
 
@@ -1210,19 +1235,16 @@ async function mergeSort(
             indiceDerecha++;
         }
 
-        barras[posicionIzquierda].classList.remove(
-            "comparando"
-        );
+        barras[posicionIzquierda]
+            .classList.remove(
+                "comparando"
+            );
 
-        barras[posicionDerecha].classList.remove(
-            "comparando"
-        );
+        barras[posicionDerecha]
+            .classList.remove(
+                "comparando"
+            );
     }
-
-
-    // ========================================
-    // AGREGAR ELEMENTOS RESTANTES
-    // ========================================
 
     while (
         indiceIzquierda <
@@ -1238,7 +1260,6 @@ async function mergeSort(
         indiceIzquierda++;
     }
 
-
     while (
         indiceDerecha <
         valoresDerecha.length
@@ -1253,11 +1274,6 @@ async function mergeSort(
         indiceDerecha++;
     }
 
-
-    // ========================================
-    // COLOCAR ELEMENTOS ORDENADOS
-    // ========================================
-
     for (
         let indice = 0;
         indice < valoresOrdenados.length;
@@ -1267,17 +1283,18 @@ async function mergeSort(
         const posicion =
             inicio + indice;
 
-        const barras =
-            document.querySelectorAll(".barra");
-
         if (
             datos[posicion] !==
             valoresOrdenados[indice]
         ) {
 
-            barras[posicion].classList.add(
-                "intercambiando"
-            );
+            const barras =
+                document.querySelectorAll(".barra");
+
+            barras[posicion]
+                .classList.add(
+                    "intercambiando"
+                );
 
             await esperar(velocidad);
 
@@ -1294,38 +1311,12 @@ async function mergeSort(
         }
     }
 
-
-    // ========================================
-    // MARCAR SEGMENTO ORDENADO
-    // ========================================
-
-    for (
-        let i = inicio;
-        i <= fin;
-        i++
-    ) {
-
-        if (
-            !posicionesOrdenadas.includes(i)
-        ) {
-
-            posicionesOrdenadas.push(i);
-        }
-    }
-
-    mostrarBarras();
-
-
-    // ========================================
-    // TERMINAR MERGE SORT
-    // ========================================
-
     if (esInicio) {
 
-        posicionesOrdenadas = datos.map(
-            (valor, indice) =>
-                indice
-        );
+        posicionesOrdenadas =
+            datos.map(
+                (valor, indice) => indice
+            );
 
         mostrarBarras();
 
@@ -1335,10 +1326,10 @@ async function mergeSort(
 
 
 // ========================================
-// EJECUTAR ALGORITMO Y MEDIR TIEMPO
+// EJECUTAR ALGORITMO
 // ========================================
 
-async function ejecutarConTiempo(
+async function ejecutarAlgoritmo(
     algoritmo
 ) {
 
@@ -1346,48 +1337,68 @@ async function ejecutarConTiempo(
         return;
     }
 
+    if (datos.length === 0) {
+
+        generarDatos();
+    }
+
     comparaciones = 0;
+
     intercambios = 0;
+
     tiempoEjecucion = 0;
 
     posicionesOrdenadas = [];
 
     actualizarMetricas();
+
     actualizarTiempo();
+
+    // ========================================
+    // MEDIR TIEMPO
+    // ========================================
 
     const inicio =
         performance.now();
 
 
     if (algoritmo === "bubble") {
+
         await bubbleSort();
     }
 
-    if (algoritmo === "selection") {
+    else if (algoritmo === "selection") {
+
         await selectionSort();
     }
 
-    if (algoritmo === "insertion") {
+    else if (algoritmo === "insertion") {
+
         await insertionSort();
     }
 
-    if (algoritmo === "gnome") {
+    else if (algoritmo === "gnome") {
+
         await gnomeSort();
     }
 
-    if (algoritmo === "exchange") {
+    else if (algoritmo === "exchange") {
+
         await exchangeSort();
     }
 
-    if (algoritmo === "stooge") {
+    else if (algoritmo === "stooge") {
+
         await stoogeSort();
     }
 
-    if (algoritmo === "quick") {
+    else if (algoritmo === "quick") {
+
         await quickSort();
     }
 
-    if (algoritmo === "merge") {
+    else if (algoritmo === "merge") {
+
         await mergeSort();
     }
 
@@ -1395,12 +1406,18 @@ async function ejecutarConTiempo(
     const fin =
         performance.now();
 
+
     tiempoEjecucion =
         fin - inicio;
 
 
-    tiemposAlgoritmos[algoritmo] =
+    // Guardar tiempo del algoritmo
+
+    tiemposAlgoritmos[
+        algoritmo
+    ] =
         tiempoEjecucion;
+
 
     actualizarTiempo();
 
@@ -1409,7 +1426,7 @@ async function ejecutarConTiempo(
 
 
 // ========================================
-// ACTUALIZAR GRÁFICA
+// GRÁFICA DE TIEMPOS
 // ========================================
 
 function actualizarGrafica() {
@@ -1433,6 +1450,7 @@ function actualizarGrafica() {
         canvas.clientHeight || 400;
 
     canvas.width = ancho;
+
     canvas.height = alto;
 
     contexto.clearRect(
@@ -1452,7 +1470,16 @@ function actualizarGrafica() {
         );
 
 
-    if (resultados.length === 0) {
+    // ========================================
+    // NO HAY RESULTADOS
+    // ========================================
+
+    if (
+        resultados.length === 0
+    ) {
+
+        contexto.fillStyle =
+            "#333";
 
         contexto.font =
             "16px Arial";
@@ -1470,10 +1497,18 @@ function actualizarGrafica() {
     }
 
 
+    // ========================================
+    // MEDIDAS
+    // ========================================
+
     const margenIzquierdo = 70;
+
     const margenDerecho = 30;
-    const margenSuperior = 30;
-    const margenInferior = 70;
+
+    const margenSuperior = 40;
+
+    const margenInferior = 80;
+
 
     const anchoGrafica =
         ancho -
@@ -1495,6 +1530,14 @@ function actualizarGrafica() {
         );
 
 
+    // Evitar división entre cero
+
+    const maximoSeguro =
+        tiempoMaximo === 0
+            ? 1
+            : tiempoMaximo;
+
+
     const espacioBarra =
         anchoGrafica /
         resultados.length;
@@ -1503,27 +1546,30 @@ function actualizarGrafica() {
         espacioBarra * 0.6;
 
 
+    // ========================================
+    // DIBUJAR BARRAS
+    // ========================================
+
     resultados.forEach(
         ([algoritmo, tiempo], indice) => {
 
             const alturaBarra =
-                tiempoMaximo === 0
-                    ? 0
-                    :
-                    (
-                        tiempo /
-                        tiempoMaximo
-                    ) *
-                    altoGrafica;
+                (
+                    tiempo /
+                    maximoSeguro
+                ) *
+                altoGrafica;
+
 
             const x =
                 margenIzquierdo +
                 indice *
-                    espacioBarra +
+                espacioBarra +
                 (
                     espacioBarra -
                     anchoBarra
                 ) / 2;
+
 
             const y =
                 margenSuperior +
@@ -1531,8 +1577,10 @@ function actualizarGrafica() {
                 alturaBarra;
 
 
+            // Barra
+
             contexto.fillStyle =
-                "#4a90e2";
+                "#38bdf8";
 
             contexto.fillRect(
                 x,
@@ -1541,6 +1589,8 @@ function actualizarGrafica() {
                 alturaBarra
             );
 
+
+            // Nombre
 
             contexto.fillStyle =
                 "#000";
@@ -1551,27 +1601,36 @@ function actualizarGrafica() {
             contexto.textAlign =
                 "center";
 
-
             contexto.fillText(
                 nombresAlgoritmos[
                     algoritmo
                 ],
+
                 x +
-                    anchoBarra / 2,
-                alto - 35
+                anchoBarra / 2,
+
+                alto - 40
             );
 
 
+            // Tiempo
+
             contexto.fillText(
                 tiempo.toFixed(3) +
-                    " ms",
+                " ms",
+
                 x +
-                    anchoBarra / 2,
+                anchoBarra / 2,
+
                 y - 8
             );
         }
     );
 
+
+    // ========================================
+    // EJES
+    // ========================================
 
     contexto.strokeStyle =
         "#000";
@@ -1579,6 +1638,8 @@ function actualizarGrafica() {
     contexto.lineWidth = 1;
 
     contexto.beginPath();
+
+    // Eje vertical
 
     contexto.moveTo(
         margenIzquierdo,
@@ -1588,14 +1649,18 @@ function actualizarGrafica() {
     contexto.lineTo(
         margenIzquierdo,
         margenSuperior +
-            altoGrafica
+        altoGrafica
     );
+
+
+    // Eje horizontal
 
     contexto.lineTo(
         ancho -
-            margenDerecho,
+        margenDerecho,
+
         margenSuperior +
-            altoGrafica
+        altoGrafica
     );
 
     contexto.stroke();
@@ -1603,7 +1668,55 @@ function actualizarGrafica() {
 
 
 // ========================================
-// BOTONES
+// REINICIAR
+// ========================================
+
+function reiniciar() {
+
+    /*
+        Si el algoritmo está ejecutándose,
+        no generamos otro proceso encima.
+    */
+
+    if (ejecutando) {
+        return;
+    }
+
+    datos = [];
+
+    posicionesOrdenadas = [];
+
+    comparaciones = 0;
+
+    intercambios = 0;
+
+    tiempoEjecucion = 0;
+
+
+    // Borrar comparación de tiempos
+
+    for (
+        const algoritmo in tiemposAlgoritmos
+    ) {
+
+        tiemposAlgoritmos[
+            algoritmo
+        ] = null;
+    }
+
+
+    actualizarMetricas();
+
+    actualizarTiempo();
+
+    actualizarGrafica();
+
+    generarDatos();
+}
+
+
+// ========================================
+// BOTÓN GENERAR
 // ========================================
 
 botonGenerar.addEventListener(
@@ -1612,64 +1725,42 @@ botonGenerar.addEventListener(
 );
 
 
+// ========================================
+// BOTÓN REINICIAR
+// ========================================
+
+botonReiniciar.addEventListener(
+    "click",
+    reiniciar
+);
+
+
+// ========================================
+// BOTÓN INICIAR
+// ========================================
+
 botonIniciar.addEventListener(
     "click",
-    function () {
+    function() {
+
+        if (ejecutando) {
+            return;
+        }
 
         const algoritmo =
             selectorAlgoritmo.value;
 
-        ejecutarConTiempo(
+        ejecutarAlgoritmo(
             algoritmo
         );
     }
 );
 
 
-botonReiniciar.addEventListener(
-    "click",
-    function () {
-
-        if (ejecutando) {
-            return;
-        }
-
-        datos = [];
-
-        posicionesOrdenadas = [];
-
-        comparaciones = 0;
-        intercambios = 0;
-        tiempoEjecucion = 0;
-
-        for (
-            const algoritmo in
-            tiemposAlgoritmos
-        ) {
-
-            tiemposAlgoritmos[
-                algoritmo
-            ] = null;
-        }
-
-        actualizarMetricas();
-        actualizarTiempo();
-        actualizarGrafica();
-
-        generarDatos();
-    }
-);
-
-
 // ========================================
-// GENERAR DATOS AL ABRIR
+// INICIO
 // ========================================
 
 generarDatos();
-
-
-// ========================================
-// MOSTRAR GRÁFICA INICIAL
-// ========================================
 
 actualizarGrafica();
