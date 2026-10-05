@@ -21,6 +21,7 @@ let datos = [];
 
 let comparaciones = 0;
 let intercambios = 0;
+let tiempoEjecucion = 0;
 
 let posicionesOrdenadas = [];
 
@@ -53,6 +54,7 @@ function generarDatos() {
     // Reinicia métricas
     comparaciones = 0;
     intercambios = 0;
+    tiempoEjecucion = 0;
 
     actualizarMetricas();
 
@@ -61,9 +63,7 @@ function generarDatos() {
 }
 
 
-// ========================================
-// MOSTRAR LAS BARRAS
-// ========================================
+// Mostrar barras
 
 function mostrarBarras() {
 
@@ -111,6 +111,9 @@ function actualizarMetricas() {
     document.getElementById("comparaciones").textContent = comparaciones;
 
     document.getElementById("intercambios").textContent = intercambios;
+
+    document.getElementById("tiempo-ejecucion").textContent =
+        tiempoEjecucion.toFixed(4) + " ms";
 }
 
 
@@ -217,6 +220,10 @@ actualizarNombreAlgoritmo();
 // ========================================
 // BUBBLE SORT
 // ========================================
+
+async function bubbleSort() {
+
+// Bubble Sort
 
 async function bubbleSort() {
 
@@ -1032,11 +1039,462 @@ async function mergeSort(
 }
 
 
+// ============================================================
+// VERSIONES RAPIDAS PARA MEDICION DE TIEMPO
+// ============================================================
 
 
-// ========================================
+// Bubble Sort rapido
+
+function bubbleSortRapido(arreglo) {
+
+    for (
+        let i = 0;
+        i < arreglo.length - 1;
+        i++
+    ) {
+
+        for (
+            let j = 0;
+            j < arreglo.length - 1 - i;
+            j++
+        ) {
+
+            if (arreglo[j] > arreglo[j + 1]) {
+
+                const temporal = arreglo[j];
+
+                arreglo[j] = arreglo[j + 1];
+
+                arreglo[j + 1] = temporal;
+            }
+        }
+    }
+}
+
+
+// Selection Sort rapido
+
+function selectionSortRapido(arreglo) {
+
+    for (
+        let i = 0;
+        i < arreglo.length - 1;
+        i++
+    ) {
+
+        let indiceMinimo = i;
+
+        for (
+            let j = i + 1;
+            j < arreglo.length;
+            j++
+        ) {
+
+            if (
+                arreglo[j] <
+                arreglo[indiceMinimo]
+            ) {
+
+                indiceMinimo = j;
+            }
+        }
+
+        if (indiceMinimo !== i) {
+
+            const temporal = arreglo[i];
+
+            arreglo[i] =
+                arreglo[indiceMinimo];
+
+            arreglo[indiceMinimo] =
+                temporal;
+        }
+    }
+}
+
+
+// Insertion Sort rapido
+
+function insertionSortRapido(arreglo) {
+
+    for (
+        let i = 1;
+        i < arreglo.length;
+        i++
+    ) {
+
+        let j = i;
+
+        while (
+            j > 0 &&
+            arreglo[j - 1] > arreglo[j]
+        ) {
+
+            const temporal =
+                arreglo[j - 1];
+
+            arreglo[j - 1] =
+                arreglo[j];
+
+            arreglo[j] =
+                temporal;
+
+            j--;
+        }
+    }
+}
+
+
+// Gnome Sort rapido
+
+function gnomeSortRapido(arreglo) {
+
+    let indice = 1;
+
+    while (indice < arreglo.length) {
+
+        if (indice === 0) {
+            indice = 1;
+        }
+
+        if (
+            arreglo[indice - 1] <=
+            arreglo[indice]
+        ) {
+
+            indice++;
+
+        } else {
+
+            const temporal =
+                arreglo[indice - 1];
+
+            arreglo[indice - 1] =
+                arreglo[indice];
+
+            arreglo[indice] =
+                temporal;
+
+            indice--;
+        }
+    }
+}
+
+
+// Exchange Sort rapido
+
+function exchangeSortRapido(arreglo) {
+
+    for (
+        let i = 0;
+        i < arreglo.length - 1;
+        i++
+    ) {
+
+        for (
+            let j = i + 1;
+            j < arreglo.length;
+            j++
+        ) {
+
+            if (arreglo[i] > arreglo[j]) {
+
+                const temporal =
+                    arreglo[i];
+
+                arreglo[i] =
+                    arreglo[j];
+
+                arreglo[j] =
+                    temporal;
+            }
+        }
+    }
+}
+
+
+// Stooge Sort rapido
+
+function stoogeSortRapido(
+    arreglo,
+    inicio,
+    fin
+) {
+
+    if (inicio >= fin) {
+        return;
+    }
+
+    if (arreglo[inicio] > arreglo[fin]) {
+
+        const temporal =
+            arreglo[inicio];
+
+        arreglo[inicio] =
+            arreglo[fin];
+
+        arreglo[fin] =
+            temporal;
+    }
+
+    if (fin - inicio + 1 > 2) {
+
+        const tercio =
+            Math.floor(
+                (fin - inicio + 1) / 3
+            );
+
+        stoogeSortRapido(
+            arreglo,
+            inicio,
+            fin - tercio
+        );
+
+        stoogeSortRapido(
+            arreglo,
+            inicio + tercio,
+            fin
+        );
+
+        stoogeSortRapido(
+            arreglo,
+            inicio,
+            fin - tercio
+        );
+    }
+}
+
+
+// Quick Sort rapido
+
+function quickSortRapido(
+    arreglo,
+    inicio,
+    fin
+) {
+
+    let izquierda = inicio;
+    let derecha = fin;
+
+    const pivote =
+        arreglo[
+            Math.floor((inicio + fin) / 2)
+        ];
+
+    while (izquierda <= derecha) {
+
+        while (
+            arreglo[izquierda] < pivote
+        ) {
+
+            izquierda++;
+        }
+
+        while (
+            arreglo[derecha] > pivote
+        ) {
+
+            derecha--;
+        }
+
+        if (izquierda <= derecha) {
+
+            const temporal =
+                arreglo[izquierda];
+
+            arreglo[izquierda] =
+                arreglo[derecha];
+
+            arreglo[derecha] =
+                temporal;
+
+            izquierda++;
+            derecha--;
+        }
+    }
+
+    if (inicio < derecha) {
+
+        quickSortRapido(
+            arreglo,
+            inicio,
+            derecha
+        );
+    }
+
+    if (izquierda < fin) {
+
+        quickSortRapido(
+            arreglo,
+            izquierda,
+            fin
+        );
+    }
+}
+
+
+// Merge Sort rapido
+
+function mergeSortRapido(arreglo) {
+
+    if (arreglo.length <= 1) {
+        return arreglo;
+    }
+
+    const medio =
+        Math.floor(arreglo.length / 2);
+
+    const izquierda =
+        mergeSortRapido(
+            arreglo.slice(0, medio)
+        );
+
+    const derecha =
+        mergeSortRapido(
+            arreglo.slice(medio)
+        );
+
+    const resultado = [];
+
+    let indiceIzquierda = 0;
+    let indiceDerecha = 0;
+
+    while (
+        indiceIzquierda < izquierda.length &&
+        indiceDerecha < derecha.length
+    ) {
+
+        if (
+            izquierda[indiceIzquierda] <=
+            derecha[indiceDerecha]
+        ) {
+
+            resultado.push(
+                izquierda[indiceIzquierda]
+            );
+
+            indiceIzquierda++;
+
+        } else {
+
+            resultado.push(
+                derecha[indiceDerecha]
+            );
+
+            indiceDerecha++;
+        }
+    }
+
+    while (
+        indiceIzquierda < izquierda.length
+    ) {
+
+        resultado.push(
+            izquierda[indiceIzquierda]
+        );
+
+        indiceIzquierda++;
+    }
+
+    while (
+        indiceDerecha < derecha.length
+    ) {
+
+        resultado.push(
+            derecha[indiceDerecha]
+        );
+
+        indiceDerecha++;
+    }
+
+    return resultado;
+}
+
+
+// ============================================================
+// MEDICION DEL TIEMPO
+// ============================================================
+
+function medirTiempoAlgoritmo(
+    algoritmo,
+    datosOriginales
+) {
+
+    // Creamos una copia para no modificar los datos
+    // que estan siendo mostrados en pantalla
+    const datosPrueba = [...datosOriginales];
+
+    const inicio = performance.now();
+
+    switch (algoritmo) {
+
+        case "bubble":
+
+            bubbleSortRapido(datosPrueba);
+
+            break;
+
+        case "selection":
+
+            selectionSortRapido(datosPrueba);
+
+            break;
+
+        case "insertion":
+
+            insertionSortRapido(datosPrueba);
+
+            break;
+
+        case "gnome":
+
+            gnomeSortRapido(datosPrueba);
+
+            break;
+
+        case "exchange":
+
+            exchangeSortRapido(datosPrueba);
+
+            break;
+
+        case "stooge":
+
+            stoogeSortRapido(
+                datosPrueba,
+                0,
+                datosPrueba.length - 1
+            );
+
+            break;
+
+        case "quick":
+
+            quickSortRapido(
+                datosPrueba,
+                0,
+                datosPrueba.length - 1
+            );
+
+            break;
+
+        case "merge":
+
+            mergeSortRapido(datosPrueba);
+
+            break;
+    }
+
+    const fin = performance.now();
+
+    return fin - inicio;
+}
+
+
+// ============================================================
 // REINICIAR
-// ========================================
+// ============================================================
 
 function reiniciar() {
 
@@ -1050,6 +1508,7 @@ function reiniciar() {
 
     comparaciones = 0;
     intercambios = 0;
+    tiempoEjecucion = 0;
 
     actualizarMetricas();
 
@@ -1066,16 +1525,79 @@ botonGenerar.addEventListener(
     generarDatos
 );
 
-
-// ========================================
-// BOTÓN REINICIAR
-// ========================================
-
 botonReiniciar.addEventListener(
     "click",
     reiniciar
 );
 
+
+botonIniciar.addEventListener(
+    "click",
+    function () {
+
+        // Evitamos iniciar dos veces
+        if (ejecutando) {
+            return;
+        }
+
+        const algoritmo =
+            selectorAlgoritmo.value;
+
+        // Medimos el tiempo real del algoritmo
+        // sin incluir la animacion visual
+        tiempoEjecucion =
+            medirTiempoAlgoritmo(
+                algoritmo,
+                datos
+            );
+
+        actualizarMetricas();
+
+
+        if (algoritmo === "bubble") {
+            bubbleSort();
+        }
+
+        if (algoritmo === "selection") {
+            selectionSort();
+        }
+
+        if (algoritmo === "insertion") {
+            insertionSort();
+        }
+
+        if (algoritmo === "gnome") {
+            gnomeSort();
+        }
+
+        if (algoritmo === "exchange") {
+            exchangeSort();
+        }
+
+        if (algoritmo === "stooge") {
+            stoogeSort();
+        }
+
+        if (algoritmo === "quick") {
+            quickSort();
+        }
+
+        if (algoritmo === "merge") {
+            mergeSort();
+        }
+
+    }
+);
+
+
+// Generamos los datos iniciales
+
+generarDatos();
+
+
+// Generamos los datos iniciales
+
+generarDatos();
 
 // ========================================
 // BOTÓN INICIAR
