@@ -145,7 +145,7 @@ actualizarVelocidad();
 
 
 // ========================================
-// ACTUALIZAR NOMBRE DEL ALGORITMO
+// ACTUALIZAR INFORMACIÓN DEL ALGORITMO
 // ========================================
 
 function actualizarNombreAlgoritmo() {
@@ -154,7 +154,57 @@ function actualizarNombreAlgoritmo() {
         selectorAlgoritmo.options[selectorAlgoritmo.selectedIndex];
 
     nombreAlgoritmo.textContent = opcion.textContent;
+
+    actualizarComplejidad();
 }
+
+
+// ========================================
+// ACTUALIZAR COMPLEJIDAD
+// ========================================
+
+function actualizarComplejidad() {
+
+    const algoritmo = selectorAlgoritmo.value;
+
+    let complejidad = "";
+
+    if (algoritmo === "bubble") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "selection") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "insertion") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "gnome") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "exchange") {
+        complejidad = "O(n²)";
+    }
+
+    if (algoritmo === "stooge") {
+        complejidad = "O(n²·⁷⁰⁹)";
+    }
+
+    if (algoritmo === "quick") {
+        complejidad = "O(n log n)";
+    }
+
+    if (algoritmo === "merge") {
+        complejidad = "O(n log n)";
+    }
+
+    document.getElementById("complejidad").textContent =
+        complejidad;
+}
+
 
 selectorAlgoritmo.addEventListener(
     "change",
