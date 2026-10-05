@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 
@@ -8,6 +9,23 @@
     <title>Skynet Algorithm Visualizer</title>
 
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        .grafica-seccion {
+            margin-top: 30px;
+        }
+
+        #grafica-tiempos {
+            width: 100%;
+            max-width: 1000px;
+            height: 400px;
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: white;
+        }
+    </style>
 </head>
 
 <body>
@@ -114,6 +132,25 @@
                 <strong>Intercambios:</strong>
                 <span id="intercambios">0</span>
             </p>
+            <p>
+    <strong>Tiempo de ejecución:</strong>
+    <span id="tiempo-ejecucion">0 ms</span>
+</p>
+
+            <p>
+                <strong>Tiempo de ejecución:</strong>
+                <span id="tiempo-ejecucion">0 ms</span>
+            </p>
+
+        </section>
+
+
+        <!-- Gráfica comparativa -->
+        <section class="grafica-seccion">
+
+            <h2>Comparación de tiempos de ejecución</h2>
+
+            <canvas id="grafica-tiempos"></canvas>
 
             <p>
                 <strong>Tiempo de ejecución:</strong>
@@ -131,6 +168,16 @@
             <canvas id="grafica-tiempos"></canvas>
 
         </section>
+
+        <!-- Gráfica comparativa de tiempos -->
+        <section class="grafica-seccion">
+
+            <h2>Comparación de tiempos de ejecución</h2>
+
+            <canvas id="grafica-tiempos"></canvas>
+
+        </section>
+
 
     </main>
 

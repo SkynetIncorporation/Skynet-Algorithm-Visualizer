@@ -26,6 +26,32 @@ let tiempoEjecucion = 0;
 
 let posicionesOrdenadas = [];
 
+// Datos para la comparación de tiempos
+let tiempoEjecucion = 0;
+
+const tiemposAlgoritmos = {
+    bubble: null,
+    selection: null,
+    insertion: null,
+    gnome: null,
+    exchange: null,
+    stooge: null,
+    quick: null,
+    merge: null
+};
+
+const nombresAlgoritmos = {
+    bubble: "Bubble Sort",
+    selection: "Selection Sort",
+    insertion: "Insertion Sort",
+    gnome: "Gnome Sort",
+    exchange: "Exchange Sort",
+    stooge: "Stooge Sort",
+    quick: "Quick Sort",
+    merge: "Merge Sort"
+};
+
+
 let ejecutando = false;
 let velocidad = 300;
 
@@ -93,9 +119,7 @@ function generarDatos() {
 }
 
 
-// ========================================
-// MOSTRAR LAS BARRAS
-// ========================================
+// Mostrar barras
 
 function mostrarBarras() {
 
@@ -151,7 +175,16 @@ function actualizarTiempo() {
 
     }
 }
+    document.getElementById("intercambios").textContent = intercambios;
 
+    document.getElementById("tiempo-ejecucion").textContent =
+        tiempoEjecucion.toFixed(4) + " ms";
+}
+function actualizarTiempo()
+{ const elementoTiempo = document.getElementById("tiempo-ejecucion"); if (elementoTiempo)
+    { elementoTiempo.textContent = tiempoEjecucion.toFixed(3) + " ms";
+    } 
+ }
 
 // ========================================
 // ESPERAR
@@ -166,13 +199,125 @@ function esperar(tiempo) {
     });
 }
 
+function actualizarGrafica() {
 
-// ========================================
-// VELOCIDAD
-// ========================================
+const canvas = document.getElementById("grafica-tiempos");
 
-function actualizarVelocidad() {
+    if (!canvas) {
+        return;
+    }
 
+    const contexto = canvas.getContext("2d");
+
+    const ancho = canvas.clientWidth;
+    const alto = canvas.clientHeight;
+
+    canvas.width = ancho;
+    canvas.height = alto;
+
+    contexto.clearRect(0, 0, ancho, alto);
+
+    const resultados = Object.entries(tiemposAlgoritmos)
+        .filter(([algoritmo, tiempo]) => tiempo !== null);
+
+    if (resultados.length === 0) {
+        contexto.font = "16px Arial";
+        contexto.textAlign = "center";
+        contexto.fillText(
+            "Ejecuta un algoritmo para mostrar resultados",
+            ancho / 2,
+            alto / 2
+        );
+        return;
+    }
+
+    const margenIzquierdo = 70;
+    const margenDerecho = 30;
+    const margenSuperior = 30;
+    const margenInferior = 70;
+
+    const anchoGrafica =
+        ancho - margenIzquierdo - margenDerecho;
+
+    const altoGrafica =
+        alto - margenSuperior - margenInferior;
+
+    const tiempoMaximo = Math.max(
+        ...resultados.map(([algoritmo, tiempo]) => tiempo)
+    );
+
+    const espacioBarra =
+        anchoGrafica / resultados.length;
+
+    const anchoBarra =
+        espacioBarra * 0.6;
+
+    resultados.forEach(([algoritmo, tiempo], indice) => {
+
+        const alturaBarra =
+            (tiempo / tiempoMaximo) * altoGrafica;
+
+        const x =
+            margenIzquierdo +
+            indice * espacioBarra +
+            (espacioBarra - anchoBarra) / 2;
+
+        const y =
+            margenSuperior +
+            altoGrafica -
+            alturaBarra;
+
+        contexto.fillStyle = "#4a90e2";
+
+        contexto.fillRect(
+            x,
+            y,
+            anchoBarra,
+            alturaBarra
+        );
+
+        contexto.fillStyle = "#000";
+        contexto.font = "12px Arial";
+        contexto.textAlign = "center";
+
+        contexto.fillText(
+            nombresAlgoritmos[algoritmo],
+            x + anchoBarra / 2,
+            alto - 35
+        );
+
+        contexto.fillText(
+            tiempo.toFixed(3) + " ms",
+            x + anchoBarra / 2,
+            y - 8
+        );
+    });
+
+    contexto.strokeStyle = "#000";
+    contexto.lineWidth = 1;
+
+    contexto.beginPath();
+
+    contexto.moveTo(
+        margenIzquierdo,
+        margenSuperior
+    );
+
+    contexto.lineTo(
+        margenIzquierdo,
+        margenSuperior + altoGrafica
+    );
+
+    contexto.lineTo(
+        ancho - margenDerecho,
+        margenSuperior + altoGrafica
+    );
+
+    contexto.stroke();
+}
+
+
+function actualizarVelocidad(){
     const valor = Number(controlVelocidad.value);
 
     velocidad = 600 - (valor * 50);
@@ -262,6 +407,10 @@ actualizarNombreAlgoritmo();
 // ========================================
 // BUBBLE SORT
 // ========================================
+
+async function bubbleSort() {
+
+// Bubble Sort
 
 async function bubbleSort() {
 
@@ -1071,7 +1220,18 @@ async function mergeSort(
 
     mostrarBarras();
 
-    await esperar(velocidad);
+// Reiniciar tiempos
+tiempoEjecucion = 0;
+
+for (const algoritmo in tiemposAlgoritmos) {
+    tiemposAlgoritmos[algoritmo] = null;
+}
+
+actualizarTiempo();
+actualizarGrafica();
+
+
+
 
 
     // ========================================
@@ -1335,15 +1495,10 @@ function actualizarGrafica() {
     contexto.stroke();
 }
 
+    const inicio = performance.now();
 
-// ========================================
-// REINICIAR
-// ========================================
-
-function reiniciar() {
-
-    if (ejecutando) {
-        return;
+    if (algoritmo === "bubble") {
+        await bubbleSort();
     }
 
     datos = [];
@@ -1363,44 +1518,34 @@ function reiniciar() {
     actualizarTiempo();
     actualizarGrafica();
 
-    generarDatos();
+    if (algoritmo === "insertion") {
+        await insertionSort();
+    }
 }
 
+    if (algoritmo === "gnome") {
+        await gnomeSort();
+    }
 
-// ========================================
-// BOTÓN GENERAR
-// ========================================
+    if (algoritmo === "exchange") {
+        await exchangeSort();
+    }
 
-botonGenerar.addEventListener(
-    "click",
-    generarDatos
-);
+    if (algoritmo === "stooge") {
+        await stoogeSort();
+    }
 
+    if (algoritmo === "quick") {
+        await quickSort();
+    }
 
-// ========================================
-// BOTÓN REINICIAR
-// ========================================
+    if (algoritmo === "merge") {
+        await mergeSort();
+    }
 
-botonReiniciar.addEventListener(
-    "click",
-    reiniciar
-);
+    const fin = performance.now();
 
-
-// ========================================
-// BOTÓN INICIAR
-// ========================================
-
-botonIniciar.addEventListener(
-    "click",
-    function() {
-
-        if (ejecutando) {
-            return;
-        }
-
-        const algoritmo =
-            selectorAlgoritmo.value;
+    tiempoEjecucion = fin - inicio;
 
         ejecutarConTiempo(algoritmo);
     }
