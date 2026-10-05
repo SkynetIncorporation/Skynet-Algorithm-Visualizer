@@ -408,6 +408,63 @@ async function exchangeSort() {
     ejecutando = false;
 }
 
+async function stoogeSort(inicio = 0, fin = datos.length - 1) {
+    const esInicio = inicio === 0 && fin === datos.length - 1;
+
+    if (esInicio) {
+        ejecutando = true;
+    }
+
+    if (inicio >= fin) {
+        if (esInicio) {
+            posicionesOrdenadas = datos.map((valor, indice) => indice);
+            mostrarBarras();
+            ejecutando = false;
+        }
+        return;
+    }
+
+    const barras = document.querySelectorAll(".barra");
+    barras[inicio].classList.add("comparando");
+    barras[fin].classList.add("comparando");
+    comparaciones++;
+    actualizarMetricas();
+
+    await esperar(velocidad);
+
+    if (datos[inicio] > datos[fin]) {
+        barras[inicio].classList.remove("comparando");
+        barras[fin].classList.remove("comparando");
+        barras[inicio].classList.add("intercambiando");
+        barras[fin].classList.add("intercambiando");
+        await esperar(velocidad);
+
+        const temporal = datos[inicio];
+        datos[inicio] = datos[fin];
+        datos[fin] = temporal;
+        intercambios++;
+        actualizarMetricas();
+        mostrarBarras();
+
+        await esperar(velocidad);
+    } else {
+        barras[inicio].classList.remove("comparando");
+        barras[fin].classList.remove("comparando");
+    }
+
+    const tercio = Math.floor((fin - inicio + 1) / 3);
+
+    await stoogeSort(inicio, fin - tercio);
+    await stoogeSort(inicio + tercio, fin);
+    await stoogeSort(inicio, fin - tercio);
+
+    if (esInicio) {
+        posicionesOrdenadas = datos.map((valor, indice) => indice);
+        mostrarBarras();
+        ejecutando = false;
+    }
+}
+
 function reiniciar() {
 
     // No se puede reiniciar mientras el algoritmo esta en ejecucion
