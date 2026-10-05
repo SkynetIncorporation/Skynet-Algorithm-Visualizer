@@ -1,4 +1,6 @@
-// Elementos de la interfaz
+// ========================================
+// ELEMENTOS DE LA INTERFAZ
+// ========================================
 
 const contenedorBarras = document.getElementById("contenedor-barras");
 const botonGenerar = document.getElementById("generar");
@@ -8,7 +10,10 @@ const controlVelocidad = document.getElementById("velocidad");
 const selectorAlgoritmo = document.getElementById("algoritmo");
 const nombreAlgoritmo = document.getElementById("nombre-algoritmo");
 
-// Configuracion
+
+// ========================================
+// CONFIGURACIÓN
+// ========================================
 
 const cantidadElementos = 20;
 
@@ -24,11 +29,13 @@ let ejecutando = false;
 let velocidad = 300;
 
 
-// Generar datos
+// ========================================
+// GENERAR DATOS
+// ========================================
 
 function generarDatos() {
 
-    // No genera datos nuevos mientras el algoritmo esta en proceso
+    // No genera datos nuevos mientras el algoritmo está en proceso
     if (ejecutando) {
         return;
     }
@@ -36,7 +43,7 @@ function generarDatos() {
     datos = [];
     posicionesOrdenadas = [];
 
-    // Genera numeros aleatorios
+    // Genera números aleatorios
     for (let i = 0; i < cantidadElementos; i++) {
 
         const valor = Math.floor(Math.random() * 91) + 10;
@@ -44,14 +51,14 @@ function generarDatos() {
         datos.push(valor);
     }
 
-    // Reinicio metricas
+    // Reinicia métricas
     comparaciones = 0;
     intercambios = 0;
     tiempoEjecucion = 0;
 
     actualizarMetricas();
 
-    // Mostramos las barras
+    // Muestra las barras
     mostrarBarras();
 }
 
@@ -81,9 +88,10 @@ function mostrarBarras() {
         // Guardamos el valor
         barra.dataset.valor = datos[i];
 
-        // Guardamos tambien la posicion
+        // Guardamos la posición
         barra.dataset.indice = i;
 
+        // Si la posición ya está ordenada
         if (posicionesOrdenadas.includes(i)) {
             barra.classList.add("ordenada");
         }
@@ -94,7 +102,9 @@ function mostrarBarras() {
 }
 
 
-// Actualizar metricas
+// ========================================
+// ACTUALIZAR MÉTRICAS
+// ========================================
 
 function actualizarMetricas() {
 
@@ -107,7 +117,9 @@ function actualizarMetricas() {
 }
 
 
-// Esperar
+// ========================================
+// ESPERAR
+// ========================================
 
 function esperar(tiempo) {
 
@@ -119,7 +131,9 @@ function esperar(tiempo) {
 }
 
 
-// Control de velocidad
+// ========================================
+// VELOCIDAD
+// ========================================
 
 function actualizarVelocidad() {
 
@@ -133,7 +147,9 @@ controlVelocidad.addEventListener("input", actualizarVelocidad);
 actualizarVelocidad();
 
 
-// Nombre del algoritmo
+// ========================================
+// ACTUALIZAR NOMBRE DEL ALGORITMO
+// ========================================
 
 function actualizarNombreAlgoritmo() {
 
@@ -143,15 +159,19 @@ function actualizarNombreAlgoritmo() {
     nombreAlgoritmo.textContent = opcion.textContent;
 }
 
-selectorAlgoritmo.addEventListener("change", actualizarNombreAlgoritmo);
+selectorAlgoritmo.addEventListener(
+    "change",
+    actualizarNombreAlgoritmo
+);
 
 actualizarNombreAlgoritmo();
 
 
-// ============================================================
-// ALGORITMOS VISUALES
-// ============================================================
+// ========================================
+// BUBBLE SORT
+// ========================================
 
+async function bubbleSort() {
 
 // Bubble Sort
 
@@ -187,7 +207,6 @@ async function bubbleSort() {
                 const temporal = datos[j];
 
                 datos[j] = datos[j + 1];
-
                 datos[j + 1] = temporal;
 
                 intercambios++;
@@ -220,7 +239,9 @@ async function bubbleSort() {
 }
 
 
-// Selection Sort
+// ========================================
+// SELECTION SORT
+// ========================================
 
 async function selectionSort() {
 
@@ -244,6 +265,7 @@ async function selectionSort() {
             await esperar(velocidad);
 
             if (datos[j] < datos[indiceMinimo]) {
+
                 indiceMinimo = j;
             }
 
@@ -277,6 +299,8 @@ async function selectionSort() {
         posicionesOrdenadas.push(i);
 
         mostrarBarras();
+
+        await esperar(velocidad);
     }
 
     posicionesOrdenadas.push(datos.length - 1);
@@ -287,7 +311,9 @@ async function selectionSort() {
 }
 
 
-// Insertion Sort
+// ========================================
+// INSERTION SORT
+// ========================================
 
 async function insertionSort() {
 
@@ -358,7 +384,9 @@ async function insertionSort() {
 }
 
 
-// Gnome Sort
+// ========================================
+// GNOME SORT
+// ========================================
 
 async function gnomeSort() {
 
@@ -417,8 +445,9 @@ async function gnomeSort() {
         indice--;
     }
 
-    posicionesOrdenadas =
-        datos.map((valor, indiceActual) => indiceActual);
+    posicionesOrdenadas = datos.map(
+        (valor, indiceActual) => indiceActual
+    );
 
     mostrarBarras();
 
@@ -426,7 +455,9 @@ async function gnomeSort() {
 }
 
 
-// Exchange Sort
+// ========================================
+// EXCHANGE SORT
+// ========================================
 
 async function exchangeSort() {
 
@@ -493,12 +524,18 @@ async function exchangeSort() {
 }
 
 
-// Stooge Sort
+// ========================================
+// STOOGE SORT
+// ========================================
 
-async function stoogeSort(inicio = 0, fin = datos.length - 1) {
+async function stoogeSort(
+    inicio = 0,
+    fin = datos.length - 1
+) {
 
     const esInicio =
-        inicio === 0 && fin === datos.length - 1;
+        inicio === 0 &&
+        fin === datos.length - 1;
 
     if (esInicio) {
         ejecutando = true;
@@ -508,8 +545,9 @@ async function stoogeSort(inicio = 0, fin = datos.length - 1) {
 
         if (esInicio) {
 
-            posicionesOrdenadas =
-                datos.map((valor, indice) => indice);
+            posicionesOrdenadas = datos.map(
+                (valor, indice) => indice
+            );
 
             mostrarBarras();
 
@@ -562,16 +600,26 @@ async function stoogeSort(inicio = 0, fin = datos.length - 1) {
     const tercio =
         Math.floor((fin - inicio + 1) / 3);
 
-    await stoogeSort(inicio, fin - tercio);
+    await stoogeSort(
+        inicio,
+        fin - tercio
+    );
 
-    await stoogeSort(inicio + tercio, fin);
+    await stoogeSort(
+        inicio + tercio,
+        fin
+    );
 
-    await stoogeSort(inicio, fin - tercio);
+    await stoogeSort(
+        inicio,
+        fin - tercio
+    );
 
     if (esInicio) {
 
-        posicionesOrdenadas =
-            datos.map((valor, indice) => indice);
+        posicionesOrdenadas = datos.map(
+            (valor, indice) => indice
+        );
 
         mostrarBarras();
 
@@ -580,7 +628,9 @@ async function stoogeSort(inicio = 0, fin = datos.length - 1) {
 }
 
 
-// Quick Sort
+// ========================================
+// QUICK SORT
+// ========================================
 
 async function quickSort(
     inicio = 0,
@@ -588,7 +638,8 @@ async function quickSort(
 ) {
 
     const esInicio =
-        inicio === 0 && fin === datos.length - 1;
+        inicio === 0 &&
+        fin === datos.length - 1;
 
     if (esInicio) {
         ejecutando = true;
@@ -598,8 +649,9 @@ async function quickSort(
 
         if (esInicio) {
 
-            posicionesOrdenadas =
-                datos.map((valor, indice) => indice);
+            posicionesOrdenadas = datos.map(
+                (valor, indice) => indice
+            );
 
             mostrarBarras();
 
@@ -674,17 +726,26 @@ async function quickSort(
     }
 
     if (inicio < derecha) {
-        await quickSort(inicio, derecha);
+
+        await quickSort(
+            inicio,
+            derecha
+        );
     }
 
     if (izquierda < fin) {
-        await quickSort(izquierda, fin);
+
+        await quickSort(
+            izquierda,
+            fin
+        );
     }
 
     if (esInicio) {
 
-        posicionesOrdenadas =
-            datos.map((valor, indice) => indice);
+        posicionesOrdenadas = datos.map(
+            (valor, indice) => indice
+        );
 
         mostrarBarras();
 
@@ -693,7 +754,9 @@ async function quickSort(
 }
 
 
-// Merge Sort
+// ========================================
+// MERGE SORT
+// ========================================
 
 async function mergeSort(
     inicio = 0,
@@ -701,7 +764,8 @@ async function mergeSort(
 ) {
 
     const esInicio =
-        inicio === 0 && fin === datos.length - 1;
+        inicio === 0 &&
+        fin === datos.length - 1;
 
     if (esInicio) {
         ejecutando = true;
@@ -711,8 +775,9 @@ async function mergeSort(
 
         if (esInicio) {
 
-            posicionesOrdenadas =
-                datos.map((valor, indice) => indice);
+            posicionesOrdenadas = datos.map(
+                (valor, indice) => indice
+            );
 
             mostrarBarras();
 
@@ -725,9 +790,15 @@ async function mergeSort(
     const medio =
         Math.floor((inicio + fin) / 2);
 
-    await mergeSort(inicio, medio);
+    await mergeSort(
+        inicio,
+        medio
+    );
 
-    await mergeSort(medio + 1, fin);
+    await mergeSort(
+        medio + 1,
+        fin
+    );
 
     const valoresIzquierda =
         datos.slice(inicio, medio + 1);
@@ -828,8 +899,9 @@ async function mergeSort(
             const barras =
                 document.querySelectorAll(".barra");
 
-            barras[posicion]
-                .classList.add("intercambiando");
+            barras[posicion].classList.add(
+                "intercambiando"
+            );
 
             await esperar(velocidad);
 
@@ -848,8 +920,9 @@ async function mergeSort(
 
     if (esInicio) {
 
-        posicionesOrdenadas =
-            datos.map((valor, indice) => indice);
+        posicionesOrdenadas = datos.map(
+            (valor, indice) => indice
+        );
 
         mostrarBarras();
 
@@ -1317,7 +1390,6 @@ function medirTiempoAlgoritmo(
 
 function reiniciar() {
 
-    // No se puede reiniciar mientras el algoritmo esta en ejecucion
     if (ejecutando) {
         return;
     }
@@ -1336,9 +1408,9 @@ function reiniciar() {
 }
 
 
-// ============================================================
-// EVENTOS
-// ============================================================
+// ========================================
+// BOTÓN GENERAR
+// ========================================
 
 botonGenerar.addEventListener(
     "click",
@@ -1419,28 +1491,58 @@ generarDatos();
 
 generarDatos();
 
-    if(algoritmo === "gnome"){
-        gnomeSort();
+// ========================================
+// BOTÓN INICIAR
+// ========================================
+
+botonIniciar.addEventListener(
+    "click",
+    function() {
+
+        if (ejecutando) {
+            return;
+        }
+
+        const algoritmo =
+            selectorAlgoritmo.value;
+
+        if (algoritmo === "bubble") {
+            bubbleSort();
+        }
+
+        if (algoritmo === "selection") {
+            selectionSort();
+        }
+
+        if (algoritmo === "insertion") {
+            insertionSort();
+        }
+
+        if (algoritmo === "gnome") {
+            gnomeSort();
+        }
+
+        if (algoritmo === "exchange") {
+            exchangeSort();
+        }
+
+        if (algoritmo === "stooge") {
+            stoogeSort();
+        }
+
+        if (algoritmo === "quick") {
+            quickSort();
+        }
+
+        if (algoritmo === "merge") {
+            mergeSort();
+        }
     }
-
-    if(algoritmo === "exchange"){
-        exchangeSort();
-    }
-
-    if(algoritmo === "stooge"){
-        stoogeSort();
-    }
-
-    if(algoritmo === "quick"){
-        quickSort();
-    }
-
-    if(algoritmo === "merge"){
-        mergeSort();
-    }
-
-});
+);
 
 
+// ========================================
+// GENERAR DATOS AL ABRIR
+// ========================================
 
 generarDatos();
