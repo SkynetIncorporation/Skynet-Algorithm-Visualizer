@@ -316,6 +316,52 @@ async function insertionSort() {
     ejecutando = false;
 }
 
+async function gnomeSort() {
+    ejecutando = true;
+    let indice = 1;
+
+    while (indice < datos.length) {
+        if (indice === 0) {
+            indice = 1;
+        }
+
+        const barras = document.querySelectorAll(".barra");
+        barras[indice - 1].classList.add("comparando");
+        barras[indice].classList.add("comparando");
+        comparaciones++;
+        actualizarMetricas();
+
+        await esperar(velocidad);
+
+        if (datos[indice - 1] <= datos[indice]) {
+            barras[indice - 1].classList.remove("comparando");
+            barras[indice].classList.remove("comparando");
+            indice++;
+            continue;
+        }
+
+        barras[indice - 1].classList.remove("comparando");
+        barras[indice].classList.remove("comparando");
+        barras[indice - 1].classList.add("intercambiando");
+        barras[indice].classList.add("intercambiando");
+        await esperar(velocidad);
+
+        const temporal = datos[indice - 1];
+        datos[indice - 1] = datos[indice];
+        datos[indice] = temporal;
+        intercambios++;
+        actualizarMetricas();
+        mostrarBarras();
+
+        await esperar(velocidad);
+        indice--;
+    }
+
+    posicionesOrdenadas = datos.map((valor, indiceActual) => indiceActual);
+    mostrarBarras();
+    ejecutando = false;
+}
+
 function reiniciar() {
 
     // No se puede reiniciar mientras el algoritmo esta en ejecucion
