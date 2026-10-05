@@ -5,6 +5,8 @@ const botonGenerar = document.getElementById("generar");
 const botonIniciar = document.getElementById("iniciar");
 const botonReiniciar = document.getElementById("reiniciar");
 const controlVelocidad = document.getElementById("velocidad");
+const selectorAlgoritmo = document.getElementById("algoritmo");
+const nombreAlgoritmo = document.getElementById("nombre-algoritmo");
 
 // Configuracion
 
@@ -20,6 +22,8 @@ let posicionesOrdenadas = [];
 
 let ejecutando = false;
 let velocidad = 300;
+
+
 
 
 function generarDatos() {
@@ -110,9 +114,18 @@ function actualizarVelocidad(){
     const valor = Number(controlVelocidad.value);
     velocidad = 600 - (valor*50);
 }
+
 controlVelocidad.addEventListener("input", actualizarVelocidad);
 actualizarVelocidad();
 
+
+
+function actualizarNombreAlgoritmo(){
+    const opcion = selectorAlgoritmo.options[selectorAlgoritmo.selectedIndex];
+    nombreAlgoritmo.textContent = opcion.textContent;
+}
+selectorAlgoritmo.addEventListener("change", actualizarNombreAlgoritmo);
+actualizarNombreAlgoritmo();
 
 async function bubbleSort() {
 
@@ -235,8 +248,11 @@ botonIniciar.addEventListener("click", function() {
     if (ejecutando) {
         return;
     }
+    const algoritmo = selectorAlgoritmo.value;
 
-    bubbleSort();
+    if(algoritmo === "bubble"){
+        bubbleSort();
+    }
 
 });
 
