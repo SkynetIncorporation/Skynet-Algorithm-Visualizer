@@ -159,31 +159,23 @@ async function bubbleSort() {
 
     ejecutando = true;
 
-    // Recorremos el arreglo
     for (let i = 0; i < datos.length - 1; i++) {
 
-        // Comparamos los elementos
         for (let j = 0; j < datos.length - 1 - i; j++) {
 
-            // Obtenemos todas las barras
             const barras = document.querySelectorAll(".barra");
 
-            // Resaltamos las dos barras que estamos comparando
             barras[j].classList.add("comparando");
             barras[j + 1].classList.add("comparando");
 
-            // Aumentamos el contador
             comparaciones++;
 
             actualizarMetricas();
 
-            // Esperamos para poder ver la comparacion
             await esperar(velocidad);
 
-            // Comparamos los valores
             if (datos[j] > datos[j + 1]) {
 
-                // Cambiamos el color para indicar intercambio
                 barras[j].classList.remove("comparando");
                 barras[j + 1].classList.remove("comparando");
 
@@ -192,32 +184,27 @@ async function bubbleSort() {
 
                 await esperar(velocidad);
 
-                // Intercambiamos los valores
                 const temporal = datos[j];
 
                 datos[j] = datos[j + 1];
 
                 datos[j + 1] = temporal;
 
-                // Aumentamos el contador
                 intercambios++;
 
                 actualizarMetricas();
 
-                // Actualizamos las barras
                 mostrarBarras();
 
                 await esperar(velocidad);
 
             } else {
 
-                // Quitamos el color de comparacion
                 barras[j].classList.remove("comparando");
                 barras[j + 1].classList.remove("comparando");
             }
         }
 
-        // Marcamos como ordenada la ultima posicion
         posicionesOrdenadas.push(datos.length - 1 - i);
 
         mostrarBarras();
@@ -225,7 +212,6 @@ async function bubbleSort() {
         await esperar(velocidad);
     }
 
-    // Marcamos la primera posicion como ordenada
     posicionesOrdenadas.push(0);
 
     mostrarBarras();
@@ -1336,13 +1322,10 @@ function reiniciar() {
         return;
     }
 
-    // Eliminamos los datos actuales
     datos = [];
 
-    // Eliminamos las posiciones ordenadas
     posicionesOrdenadas = [];
 
-    // Reinicio metricas
     comparaciones = 0;
     intercambios = 0;
     tiempoEjecucion = 0;
@@ -1392,47 +1375,44 @@ botonIniciar.addEventListener(
 
 
         if (algoritmo === "bubble") {
-
             bubbleSort();
         }
 
         if (algoritmo === "selection") {
-
             selectionSort();
         }
 
         if (algoritmo === "insertion") {
-
             insertionSort();
         }
 
         if (algoritmo === "gnome") {
-
             gnomeSort();
         }
 
         if (algoritmo === "exchange") {
-
             exchangeSort();
         }
 
         if (algoritmo === "stooge") {
-
             stoogeSort();
         }
 
         if (algoritmo === "quick") {
-
             quickSort();
         }
 
         if (algoritmo === "merge") {
-
             mergeSort();
         }
 
     }
 );
+
+
+// Generamos los datos iniciales
+
+generarDatos();
 
 
 // Generamos los datos iniciales
