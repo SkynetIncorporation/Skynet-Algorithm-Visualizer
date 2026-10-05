@@ -879,3 +879,4 @@ botonIniciar.addEventListener("click", function() {
 
 
 generarDatos();
+}
