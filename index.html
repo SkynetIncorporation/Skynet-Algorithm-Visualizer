@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 
@@ -8,6 +9,23 @@
     <title>Skynet Algorithm Visualizer</title>
 
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        .grafica-seccion {
+            margin-top: 30px;
+        }
+
+        #grafica-tiempos {
+            width: 100%;
+            max-width: 1000px;
+            height: 400px;
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: white;
+        }
+    </style>
 </head>
 
 <body>
@@ -27,16 +45,17 @@
             <label for="algoritmo">
                 Algoritmo:
             </label>
+
             <select id="algoritmo">
-            <option value="bubble">Bubble Sort</option>
-            <option value="selection">Selection Sort</option>
-            <option value="insertion">Insertion Sort</option>
-            <option value="gnome">Gnome Sort</option>
-            <option value="exchange">Exchange Sort</option>
-            <option value="stooge">Stooge Sort</option>
-            <option value="quick">Quick Sort</option>
-            <option value="merge">Merge Sort</option>
-        </select>
+                <option value="bubble">Bubble Sort</option>
+                <option value="selection">Selection Sort</option>
+                <option value="insertion">Insertion Sort</option>
+                <option value="gnome">Gnome Sort</option>
+                <option value="exchange">Exchange Sort</option>
+                <option value="stooge">Stooge Sort</option>
+                <option value="quick">Quick Sort</option>
+                <option value="merge">Merge Sort</option>
+            </select>
 
 
             <button id="generar">
@@ -113,6 +132,21 @@
                 <strong>Intercambios:</strong>
                 <span id="intercambios">0</span>
             </p>
+
+            <p>
+                <strong>Tiempo de ejecución:</strong>
+                <span id="tiempo-ejecucion">0 ms</span>
+            </p>
+
+        </section>
+
+
+        <!-- Gráfica comparativa -->
+        <section class="grafica-seccion">
+
+            <h2>Comparación de tiempos de ejecución</h2>
+
+            <canvas id="grafica-tiempos"></canvas>
 
         </section>
 
