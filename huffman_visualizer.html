@@ -77,12 +77,87 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
 .seg button{background:transparent;color:var(--ink);border:0;border-radius:0;padding:8px 16px}
 .seg button[aria-pressed="true"]{background:var(--teal);color:var(--on-teal)}
 @media (prefers-reduced-motion:reduce){#ptr,.cell,.l,.count{transition:none}}
+
+/* Flujo visual del proyecto: Issue #13 */
+.workflow{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:10px;
+  margin:0 0 22px;
+}
+.workflow-step{
+  position:relative;
+  min-height:126px;
+  padding:13px 11px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--panel);
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.workflow-step.active{
+  border:2px solid var(--teal);
+  background:var(--teal-t);
+}
+.workflow-number{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:var(--teal);
+  color:var(--on-teal);
+  font:600 13px "JetBrains Mono",ui-monospace,monospace;
+}
+.workflow-step strong{font-size:14px;line-height:1.25}
+.workflow-step span:last-child{font-size:12px;color:var(--mute);line-height:1.35}
+@media(max-width:760px){
+  .workflow{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:440px){
+  .workflow{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
 </style>
 </head>
 <body>
 <main>
   <h1>Huffman paso a paso</h1>
   <p class="sub" id="sub">Escribe un texto y observa cómo se cuentan sus caracteres.</p>
+
+  <section class="workflow" aria-label="Etapas del proceso de compresión Huffman">
+    <article class="workflow-step active">
+      <span class="workflow-number">01</span>
+      <strong>Buscar / Subir</strong>
+      <span>Seleccionar el texto que se desea comprimir.</span>
+    </article>
+    <article class="workflow-step">
+      <span class="workflow-number">02</span>
+      <strong>Analizar</strong>
+      <span>Revisar el contenido y calcular las frecuencias.</span>
+    </article>
+    <article class="workflow-step">
+      <span class="workflow-number">03</span>
+      <strong>Construir</strong>
+      <span>Visualizar la construcción del árbol de Huffman.</span>
+    </article>
+    <article class="workflow-step">
+      <span class="workflow-number">04</span>
+      <strong>Comprimir</strong>
+      <span>Generar la secuencia de bits codificada.</span>
+    </article>
+    <article class="workflow-step">
+      <span class="workflow-number">05</span>
+      <strong>Inspeccionar</strong>
+      <span>Consultar frecuencias, códigos y resultados.</span>
+    </article>
+    <article class="workflow-step">
+      <span class="workflow-number">06</span>
+      <strong>Descargar / Descomprimir</strong>
+      <span>Obtener el resultado o recuperar el texto original.</span>
+    </article>
+  </section>
 
   <div id="stack" class="panel" aria-label="Cajas de frecuencia"></div>
 
