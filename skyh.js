@@ -118,4 +118,72 @@
     return sha256Js(datos);
   }
 
+  // ------------------------------------------------------------
+  // UTILIDADES
+  // ------------------------------------------------------------
+  function aHex(bytes) {
+    let s = "";
+    for (let i = 0; i < bytes.length; i++) s += bytes[i].toString(16).padStart(2, "0");
+    return s;
+  }
+
+  function iguales(a, b) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
+  }
+
+  /** Convierte File/Blob/ArrayBuffer/TypedArray a Uint8Array. */
+  async function aBytes(entrada) {
+    if (entrada instanceof Uint8Array) return entrada;
+    if (entrada instanceof ArrayBuffer) return new Uint8Array(entrada);
+    if (ArrayBuffer.isView(entrada)) {
+      return new Uint8Array(entrada.buffer, entrada.byteOffset, entrada.byteLength);
+    }
+    if (entrada && typeof entrada.arrayBuffer === "function") {
+      return new Uint8Array(await entrada.arrayBuffer());
+    }
+    throw new SkyhError("Entrada no válida: se esperaba un File, ArrayBuffer o Uint8Array.");
+  }
+
+  function textoABytes(texto) {
+    return new TextEncoder().encode(texto);
+  }
+
+  function bytesATexto(bytes) {
+    return new TextDecoder("utf-8").decode(bytes);
+  }
+
+  /** Codifica el nombre en UTF-8 y lo recorta a 255 bytes sin partir un carácter. */
+  function nombreABytes(nombre) {
+    let b = textoABytes(nombre || "");
+    if (b.length > 255) {
+      let corte = 255;
+      while (corte > 0 && (b[corte] & 0xc0) === 0x80) corte--;
+      b = b.subarray(0, corte);
+    }
+    return b;
+  }
+
+  function formatearTamano(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+  }
+
+  /** Métricas de la sección 5 de la actividad. */
+  function calcularMetricas(tamOriginal, tamComprimido) {
+    const ahorro = tamOriginal - tamComprimido;
+    return {
+      tamanoOriginal: tamOriginal,
+      tamanoComprimido: tamComprimido,
+      ahorro,
+      porcentajeReduccion: tamOriginal > 0 ? (ahorro / tamOriginal) * 100 : 0,
+      razonCompresion: tamComprimido > 0 ? tamOriginal / tamComprimido : 0,
+      textoOriginal: formatearTamano(tamOriginal),
+      textoComprimido: formatearTamano(tamComprimido),
+      textoAhorro: (ahorro < 0 ? "-" : "") + formatearTamano(Math.abs(ahorro)),
+    };
+  }
+
 })(typeof globalThis !== "undefined" ? globalThis : this);
