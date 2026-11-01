@@ -357,4 +357,75 @@
     return { bytes: salida, bitsLeidos };
   }
 
+  // ------------------------------------------------------------
+  // ESCRIBIR ARCHIVO .skyh
+  // ------------------------------------------------------------
+
+  /**
+   * Comprime `bytes` y devuelve el contenido del archivo .skyh.
+   * @param {Uint8Array|ArrayBuffer|File|Blob|string} entrada  contenido original
+   * @param {string} nombre  nombre original (ej. "libro.txt")
+   * @returns {Promise<{archivo: Uint8Array, info: object}>}
+   */
+  async function escribirArchivo(entrada, nombre) {
+    const bytes = typeof entrada === "string" ? textoABytes(entrada) : await aBytes(entrada);
+    if (bytes.length > MAX_UINT32) throw new SkyhError("El archivo supera el máximo de 4 GB del formato v1.");
+
+    const frecuencias = calcularFrecuencias(bytes);
+    const tabla = frecuenciasATabla(frecuencias);
+    const raiz = construirArbol(tabla);
+    const codigos = generarCodigos(raiz);
+    const totalBits = contarBits(tabla, codigos);
+    if (totalBits > MAX_UINT32) throw new SkyhError("El total de bits supera el máximo del formato v1.");
+
+    const datos = codificar(bytes, codigos, totalBits);
+    const hash = await sha256(bytes);
+    const nombreBytes = nombreABytes(nombre);
+
+    const offNombre = TAM_HEADER;
+    const offTabla = offNombre + 1 + nombreBytes.length;
+    const offDatos = offTabla + tabla.length * TAM_ENTRADA_TABLA;
+    const archivo = new Uint8Array(offDatos + datos.length);
+    const dv = new DataView(archivo.buffer);
+
+    archivo.set(MAGIC, 0);
+    archivo[4] = VERSION;
+    archivo[5] = 0; // flags
+    dv.setUint32(6, bytes.length, true);
+    dv.setUint32(10, totalBits, true);
+    dv.setUint16(14, tabla.length, true);
+    archivo.set(hash, 16);
+
+    archivo[offNombre] = nombreBytes.length;
+    archivo.set(nombreBytes, offNombre + 1);
+
+    tabla.forEach(({ simbolo, frecuencia }, i) => {
+      const o = offTabla + i * TAM_ENTRADA_TABLA;
+      archivo[o] = simbolo;
+      dv.setUint32(o + 1, frecuencia, true);
+    });
+
+    archivo.set(datos, offDatos);
+
+    const info = armarInfo({
+      version: VERSION, flags: 0,
+      tamanoOriginal: bytes.length, totalBits, hash,
+      nombreOriginal: new TextDecoder().decode(nombreBytes),
+      tabla, raiz, codigos, datos,
+      tamanoComprimido: archivo.length,
+      offsets: { nombre: offNombre, tabla: offTabla, datos: offDatos },
+    });
+    return { archivo, info };
+  }
+
+  function armarInfo(c) {
+    return {
+      ...c,
+      numSimbolos: c.tabla.length,
+      hashHex: aHex(c.hash),
+      metricas: calcularMetricas(c.tamanoOriginal, c.tamanoComprimido),
+      bitsRelleno: (8 - (c.totalBits % 8)) % 8,
+    };
+  }
+
 })(typeof globalThis !== "undefined" ? globalThis : this);
