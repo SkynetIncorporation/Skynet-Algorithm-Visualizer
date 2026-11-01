@@ -304,4 +304,57 @@
     return total;
   }
 
+  // ------------------------------------------------------------
+  // EMPAQUETADO / DESEMPAQUETADO DE BITS (MSB primero)
+  // ------------------------------------------------------------
+
+  /** Codifica los bytes con los códigos y los empaqueta. */
+  function codificar(bytes, codigos, totalBits) {
+    const datos = new Uint8Array(Math.ceil(totalBits / 8));
+    const tablaCodigos = new Array(256);
+    for (const [s, c] of codigos) tablaCodigos[s] = c;
+
+    let acumulador = 0, bitsAcum = 0, pos = 0;
+    for (let i = 0; i < bytes.length; i++) {
+      const c = tablaCodigos[bytes[i]];
+      for (let j = 0; j < c.length; j++) {
+        acumulador = (acumulador << 1) | (c.charCodeAt(j) - 48);
+        if (++bitsAcum === 8) {
+          datos[pos++] = acumulador;
+          acumulador = 0;
+          bitsAcum = 0;
+        }
+      }
+    }
+    if (bitsAcum > 0) datos[pos++] = acumulador << (8 - bitsAcum); // relleno con ceros
+    return datos;
+  }
+
+  /**
+   * Decodifica `totalBits` bits recorriendo el árbol hasta producir
+   * `tamanoOriginal` bytes. Devuelve { bytes, bitsLeidos }.
+   */
+  function decodificar(datos, totalBits, tamanoOriginal, raiz) {
+    const salida = new Uint8Array(tamanoOriginal);
+    if (tamanoOriginal === 0) return { bytes: salida, bitsLeidos: 0 };
+
+    let producidos = 0, bitsLeidos = 0;
+    if (!raiz.izq) { // un solo símbolo: cada bit "0" es una hoja
+      salida.fill(raiz.simbolo);
+      return { bytes: salida, bitsLeidos: totalBits };
+    }
+
+    let nodo = raiz;
+    while (bitsLeidos < totalBits && producidos < tamanoOriginal) {
+      const bit = (datos[bitsLeidos >> 3] >> (7 - (bitsLeidos & 7))) & 1;
+      bitsLeidos++;
+      nodo = bit === 0 ? nodo.izq : nodo.der;
+      if (!nodo.izq) {
+        salida[producidos++] = nodo.simbolo;
+        nodo = raiz;
+      }
+    }
+    return { bytes: salida, bitsLeidos };
+  }
+
 })(typeof globalThis !== "undefined" ? globalThis : this);
