@@ -580,4 +580,22 @@
     return (base || "archivo") + ".skyh";
   }
 
+  // ------------------------------------------------------------
+  // EXPORTACIÓN
+  // ------------------------------------------------------------
+  const Skyh = {
+    // Formato
+    MAGIC, VERSION, TAM_HEADER, SkyhError,
+    // Archivo
+    escribirArchivo, leerArchivo, descomprimir,
+    // Pasos de Huffman (para la visualización)
+    calcularFrecuencias, frecuenciasATabla, construirArbol, generarCodigos,
+    codificar, decodificar, ColaPrioridad,
+    // Ayudas
+    calcularMetricas, formatearTamano, vistaPreviaDatos, etiquetaSimbolo,
+    textoABytes, bytesATexto, aHex, sha256, descargar, nombreSkyh,
+  };
+
+  if (typeof module !== "undefined" && module.exports) module.exports = Skyh;
+  global.Skyh = Skyh;
 })(typeof globalThis !== "undefined" ? globalThis : this);
