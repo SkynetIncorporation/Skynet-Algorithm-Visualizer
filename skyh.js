@@ -532,4 +532,52 @@
     return { bytes, hashCalculado, integro: hashCalculado === info.hashHex };
   }
 
+  // ------------------------------------------------------------
+  // AYUDAS PARA EL INSPECTOR Y LA INTERFAZ
+  // ------------------------------------------------------------
+
+  /** Vista parcial legible de los datos comprimidos (hex y bits). */
+  function vistaPreviaDatos(info, maxBytes) {
+    const n = Math.min(maxBytes || 32, info.datos.length);
+    const trozo = info.datos.subarray(0, n);
+    const hex = Array.from(trozo, (b) => b.toString(16).padStart(2, "0").toUpperCase());
+    const bits = Array.from(trozo, (b) => b.toString(2).padStart(8, "0"));
+    return {
+      hex: hex.join(" "),
+      bits: bits.join(" "),
+      bytesMostrados: n,
+      bytesTotales: info.datos.length,
+      truncado: n < info.datos.length,
+    };
+  }
+
+  /** Etiqueta visible de un símbolo (byte). */
+  function etiquetaSimbolo(s) {
+    if (s === 32) return "␣";
+    if (s === 10) return "↵";
+    if (s === 13) return "⏎";
+    if (s === 9) return "⇥";
+    if (s > 32 && s < 127) return String.fromCharCode(s);
+    return "0x" + s.toString(16).toUpperCase().padStart(2, "0");
+  }
+
+  /** Dispara la descarga de un Uint8Array en el navegador. */
+  function descargar(bytes, nombre, tipoMime) {
+    const blob = new Blob([bytes], { type: tipoMime || "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nombre;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  /** "libro.txt" → "libro.skyh" */
+  function nombreSkyh(nombreOriginal) {
+    const base = (nombreOriginal || "archivo").replace(/\.[^.]*$/, "");
+    return (base || "archivo") + ".skyh";
+  }
+
 })(typeof globalThis !== "undefined" ? globalThis : this);
