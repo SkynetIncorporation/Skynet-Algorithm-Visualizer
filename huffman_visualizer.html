@@ -46,6 +46,31 @@ h1{font-size:26px;margin:0 0 4px;font-weight:600;letter-spacing:-.01em}
 .cell.nl{color:var(--mute);font-size:14px}
 #ptr{position:absolute;left:0;top:0;width:32px;height:32px;border:2px solid var(--amber);border-radius:4px;pointer-events:none;transition:transform .2s ease}
 .fly{position:fixed;z-index:50;transform-origin:0 0;text-align:center;font:600 20px "JetBrains Mono",ui-monospace,monospace;line-height:32px;color:var(--amber);pointer-events:none}
+
+.file-picker{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px;
+  margin:0 0 12px;
+  padding:12px;
+  border:1px dashed var(--line);
+  border-radius:10px;
+  background:var(--panel);
+}
+.file-picker label{font-weight:600;color:var(--ink)}
+.file-picker input[type="file"]{
+  max-width:100%;
+  color:var(--mute);
+  font:14px "Instrument Sans",system-ui,sans-serif;
+}
+.file-info{
+  flex-basis:100%;
+  color:var(--mute);
+  font-size:13px;
+  overflow-wrap:anywhere;
+}
+
 textarea{display:block;width:100%;min-height:120px;resize:vertical;margin-bottom:16px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:400 17px/1.5 "JetBrains Mono",ui-monospace,monospace}
 textarea:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -169,6 +194,11 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
   </div>
 
   <div class="seg" role="group" aria-label="Modo"><button id="mc" aria-pressed="true">Comprimir</button><button id="md" aria-pressed="false">Descomprimir</button></div>
+  <div class="file-picker">
+    <label for="fileInput">Cargar archivo de texto (.txt)</label>
+    <input id="fileInput" type="file" accept=".txt,text/plain">
+    <span id="fileInfo" class="file-info" aria-live="polite">No se ha seleccionado ningún archivo.</span>
+  </div>
   <textarea id="text" aria-label="Texto a analizar">Esto es un ejemplo de compresión</textarea>
   <div id="view" class="panel" hidden></div>
 
@@ -186,7 +216,8 @@ const CANCEL = Symbol("cancel");
 const label = c => c === " " ? "␣" : c === "\n" ? "↵" : c === "\t" ? "⇥" : c;
 
 class HuffmanViz {
-  #text; #view; #stack; #status; #start; #next; #reset; #speed;
+  #text; #view; #stack; #status; #start; #next; #reset; #speed; #fileInput; #fileInfo;
+  #fileBytes = new Uint8Array();
   #ptr = null; #cells = []; #boxes = new Map(); #token = 0;
   #tree; #tin; #arrows; #out; #mc; #md; #sub; #mode = "c"; #busy = false; #dActive = false; #ctext = ""; #chars = []; #codes = new Map(); #nodes = []; #queue = []; #stage = 0;
 
@@ -195,6 +226,8 @@ class HuffmanViz {
     this.#text = g("text"); this.#view = g("view"); this.#stack = g("stack");
     this.#status = g("status"); this.#start = g("start"); this.#next = g("next");
     this.#reset = g("reset"); this.#speed = g("speed");
+    this.#fileInput = g("fileInput"); this.#fileInfo = g("fileInfo");
+    this.#fileInput.addEventListener("change", () => this.#loadFile());
     this.#tree = g("tree"); this.#tin = g("tin"); this.#arrows = g("arrows"); this.#out = g("out");
     this.#mc = g("mc"); this.#md = g("md"); this.#sub = g("sub");
     this.#mc.onclick = () => this.#setMode("c");
@@ -203,6 +236,42 @@ class HuffmanViz {
     this.#next.onclick = () => this.#advance();
     this.#reset.onclick = () => this.#restore();
     this.#sync();
+  }
+
+  async #loadFile() {
+    const file = this.#fileInput.files?.[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".txt")) {
+      this.#fileInfo.textContent = "Selecciona un archivo con extensión .txt.";
+      this.#status.textContent = "Formato no válido. Solo se permiten archivos .txt.";
+      this.#fileInput.value = "";
+      return;
+    }
+
+    try {
+      // Se leen los bytes originales del archivo y se conservan en un Uint8Array.
+      this.#fileBytes = new Uint8Array(await file.arrayBuffer());
+
+      // La visualización actual trabaja con texto; por eso decodificamos los bytes UTF-8.
+      const content = new TextDecoder("utf-8", { fatal: true }).decode(this.#fileBytes);
+
+      this.#restore();
+      this.#text.value = content;
+      this.#ctext = content;
+      this.#fileInfo.textContent =
+        `${file.name} · ${this.#fileBytes.length.toLocaleString("es-MX")} bytes`;
+      this.#status.textContent =
+        `Archivo cargado correctamente: ${this.#fileBytes.length} bytes leídos en un Uint8Array. Pulsa Iniciar para analizar el texto.`;
+      this.#text.hidden = false;
+      this.#view.hidden = true;
+    } catch (error) {
+      this.#fileBytes = new Uint8Array();
+      this.#fileInput.value = "";
+      this.#fileInfo.textContent = "No se pudo leer el archivo como texto UTF-8.";
+      this.#status.textContent =
+        "Error al cargar el archivo. Verifica que sea un .txt codificado en UTF-8.";
+    }
   }
 
   get #step() { return 1200 / Number(this.#speed.value); }
@@ -467,6 +536,7 @@ class HuffmanViz {
   #sync() {
     const lock = this.#busy || (this.#stage > 0 && this.#stage < 6), d = this.#mode === "d";
     this.#mc.disabled = lock; this.#md.disabled = lock;
+    this.#fileInput.disabled = lock || d;
     this.#start.disabled = this.#busy || (!d && this.#stage > 0 && this.#stage < 6);
     this.#reset.disabled = !(this.#busy || (d ? this.#dActive : this.#stage > 0));
     if (d) this.#next.disabled = true;
