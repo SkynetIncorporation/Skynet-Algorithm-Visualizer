@@ -186,4 +186,122 @@
     };
   }
 
+  // ------------------------------------------------------------
+  // HUFFMAN: FRECUENCIAS, ÁRBOL, CÓDIGOS
+  // ------------------------------------------------------------
+
+  /** Frecuencia de cada byte (0–255). */
+  function calcularFrecuencias(bytes) {
+    const f = new Uint32Array(256);
+    for (let i = 0; i < bytes.length; i++) f[bytes[i]]++;
+    return f;
+  }
+
+  /** Tabla [{simbolo, frecuencia}] ordenada por símbolo, solo con frecuencia > 0. */
+  function frecuenciasATabla(frecuencias) {
+    const tabla = [];
+    for (let s = 0; s < 256; s++) {
+      if (frecuencias[s] > 0) tabla.push({ simbolo: s, frecuencia: frecuencias[s] });
+    }
+    return tabla;
+  }
+
+  // Criterio de desempate determinista (sección 3.2 de la especificación):
+  // menor frecuencia primero; si empatan, menor símbolo mínimo del subárbol.
+  function menorQue(a, b) {
+    return a.frecuencia < b.frecuencia ||
+      (a.frecuencia === b.frecuencia && a.minSimbolo < b.minSimbolo);
+  }
+
+  /** Cola de prioridad (min-heap) para la estrategia voraz. */
+  class ColaPrioridad {
+    constructor() { this.h = []; }
+    get tamano() { return this.h.length; }
+
+    insertar(nodo) {
+      const h = this.h;
+      h.push(nodo);
+      let i = h.length - 1;
+      while (i > 0) {
+        const p = (i - 1) >> 1;
+        if (!menorQue(h[i], h[p])) break;
+        [h[i], h[p]] = [h[p], h[i]];
+        i = p;
+      }
+    }
+
+    extraerMinimo() {
+      const h = this.h;
+      const min = h[0];
+      const ultimo = h.pop();
+      if (h.length > 0) {
+        h[0] = ultimo;
+        let i = 0;
+        for (;;) {
+          const l = 2 * i + 1, r = l + 1;
+          let m = i;
+          if (l < h.length && menorQue(h[l], h[m])) m = l;
+          if (r < h.length && menorQue(h[r], h[m])) m = r;
+          if (m === i) break;
+          [h[i], h[m]] = [h[m], h[i]];
+          i = m;
+        }
+      }
+      return min;
+    }
+  }
+
+  /**
+   * Construye el árbol de Huffman desde la tabla [{simbolo, frecuencia}].
+   * Devuelve la raíz (o null si la tabla está vacía).
+   * Hoja:    { frecuencia, simbolo, minSimbolo, izq: null, der: null }
+   * Interno: { frecuencia, simbolo: -1, minSimbolo, izq, der }
+   * `pasos` (opcional): arreglo donde se registra cada fusión, útil para animar.
+   */
+  function construirArbol(tabla, pasos) {
+    if (tabla.length === 0) return null;
+    const cola = new ColaPrioridad();
+    for (const { simbolo, frecuencia } of tabla) {
+      cola.insertar({ frecuencia, simbolo, minSimbolo: simbolo, izq: null, der: null });
+    }
+    while (cola.tamano > 1) {
+      const a = cola.extraerMinimo(); // menor → rama izquierda (0)
+      const b = cola.extraerMinimo(); // siguiente → rama derecha (1)
+      const padre = {
+        frecuencia: a.frecuencia + b.frecuencia,
+        simbolo: -1,
+        minSimbolo: Math.min(a.minSimbolo, b.minSimbolo),
+        izq: a,
+        der: b,
+      };
+      if (pasos) pasos.push({ izq: a, der: b, padre });
+      cola.insertar(padre);
+    }
+    return cola.extraerMinimo();
+  }
+
+  /** Genera Map(símbolo → código "0101…"). Un solo símbolo recibe "0". */
+  function generarCodigos(raiz) {
+    const codigos = new Map();
+    if (!raiz) return codigos;
+    if (!raiz.izq) {
+      codigos.set(raiz.simbolo, "0");
+      return codigos;
+    }
+    const recorrer = (nodo, prefijo) => {
+      if (!nodo.izq) { codigos.set(nodo.simbolo, prefijo); return; }
+      recorrer(nodo.izq, prefijo + "0");
+      recorrer(nodo.der, prefijo + "1");
+    };
+    recorrer(raiz, "");
+    return codigos;
+  }
+
+  /** Suma de frecuencia × longitud de código = total de bits esperado. */
+  function contarBits(tabla, codigos) {
+    let total = 0;
+    for (const { simbolo, frecuencia } of tabla) total += frecuencia * codigos.get(simbolo).length;
+    return total;
+  }
+
 })(typeof globalThis !== "undefined" ? globalThis : this);
