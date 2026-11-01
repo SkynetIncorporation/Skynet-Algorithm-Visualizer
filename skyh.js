@@ -514,4 +514,22 @@
     });
   }
 
+  // ------------------------------------------------------------
+  // DESCOMPRIMIR + INTEGRIDAD
+  // ------------------------------------------------------------
+
+  /**
+   * Decodifica el contenido de un `info` devuelto por leerArchivo/escribirArchivo
+   * y verifica el SHA-256 contra el almacenado en el header.
+   * @returns {Promise<{bytes: Uint8Array, hashCalculado: string, integro: boolean}>}
+   */
+  async function descomprimir(info) {
+    const { bytes, bitsLeidos } = decodificar(info.datos, info.totalBits, info.tamanoOriginal, info.raiz);
+    if (info.tamanoOriginal > 0 && info.raiz.izq && bitsLeidos !== info.totalBits) {
+      throw new SkyhError("Los datos terminaron antes de producir el tamaño original: archivo corrupto.");
+    }
+    const hashCalculado = aHex(await sha256(bytes));
+    return { bytes, hashCalculado, integro: hashCalculado === info.hashHex };
+  }
+
 })(typeof globalThis !== "undefined" ? globalThis : this);
