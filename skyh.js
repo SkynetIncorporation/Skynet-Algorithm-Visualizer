@@ -428,4 +428,90 @@
     };
   }
 
+  // ------------------------------------------------------------
+  // LEER ARCHIVO .skyh (solo inspección, no descomprime)
+  // ------------------------------------------------------------
+
+  /**
+   * Valida y analiza un archivo .skyh. NO decodifica el contenido:
+   * primero se inspecciona y luego se llama a descomprimir(info).
+   * @param {File|Blob|ArrayBuffer|Uint8Array} entrada
+   * @param {string} [nombreArchivo]  nombre del .skyh cargado (si no es File)
+   * @returns {Promise<object>} info
+   */
+  async function leerArchivo(entrada, nombreArchivo) {
+    const nombreCarga = nombreArchivo || (entrada && entrada.name) || "";
+    const arch = await aBytes(entrada);
+
+    // --- Validación (sección 5) ---
+    if (arch.length < TAM_HEADER + 1) {
+      throw new SkyhError("Archivo demasiado pequeño: no contiene un header .skyh completo.");
+    }
+    if (!iguales(arch.subarray(0, 4), MAGIC)) {
+      throw new SkyhError('Magic inválido: el archivo no empieza con "SKYH".');
+    }
+    const dv = new DataView(arch.buffer, arch.byteOffset, arch.byteLength);
+    const version = arch[4];
+    if (version !== VERSION) {
+      throw new SkyhError(`Versión no soportada: ${version} (se esperaba ${VERSION}).`);
+    }
+
+    const flags = arch[5];
+    const tamanoOriginal = dv.getUint32(6, true);
+    const totalBits = dv.getUint32(10, true);
+    const n = dv.getUint16(14, true);
+    if (n > 256) throw new SkyhError(`Número de símbolos inválido: ${n} (máximo 256).`);
+    const hash = arch.slice(16, 48);
+
+    const largoNombre = arch[TAM_HEADER];
+    const offNombre = TAM_HEADER;
+    const offTabla = offNombre + 1 + largoNombre;
+    const offDatos = offTabla + n * TAM_ENTRADA_TABLA;
+    const tamDatos = Math.ceil(totalBits / 8);
+    const tamanoEsperado = offDatos + tamDatos;
+
+    if (arch.length !== tamanoEsperado) {
+      throw new SkyhError(
+          `Tamaño inconsistente: el archivo mide ${arch.length} B y el header indica ${tamanoEsperado} B. ` +
+          "Puede estar truncado o corrupto."
+      );
+    }
+
+    const nombreOriginal = bytesATexto(arch.subarray(offNombre + 1, offNombre + 1 + largoNombre));
+
+    // --- Tabla de frecuencias ---
+    const tabla = [];
+    let suma = 0, previo = -1;
+    for (let i = 0; i < n; i++) {
+      const o = offTabla + i * TAM_ENTRADA_TABLA;
+      const simbolo = arch[o];
+      const frecuencia = dv.getUint32(o + 1, true);
+      if (simbolo <= previo) throw new SkyhError("La tabla de frecuencias no está ordenada o repite símbolos.");
+      if (frecuencia === 0) throw new SkyhError(`El símbolo ${simbolo} tiene frecuencia 0.`);
+      previo = simbolo;
+      suma += frecuencia;
+      tabla.push({ simbolo, frecuencia });
+    }
+    if (suma !== tamanoOriginal) {
+      throw new SkyhError(`La suma de frecuencias (${suma}) no coincide con el tamaño original (${tamanoOriginal}).`);
+    }
+
+    // --- Reconstrucción del árbol y códigos (mismo desempate) ---
+    const raiz = construirArbol(tabla);
+    const codigos = generarCodigos(raiz);
+    const bitsEsperados = contarBits(tabla, codigos);
+    if (bitsEsperados !== totalBits) {
+      throw new SkyhError(`Total de bits inconsistente: el header dice ${totalBits} y la tabla implica ${bitsEsperados}.`);
+    }
+
+    return armarInfo({
+      version, flags, tamanoOriginal, totalBits, hash,
+      nombreOriginal, nombreArchivo: nombreCarga,
+      tabla, raiz, codigos,
+      datos: arch.subarray(offDatos),
+      tamanoComprimido: arch.length,
+      offsets: { nombre: offNombre, tabla: offTabla, datos: offDatos },
+    });
+  }
+
 })(typeof globalThis !== "undefined" ? globalThis : this);
