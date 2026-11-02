@@ -118,7 +118,95 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
 @media(max-width:440px){
   .workflow{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+/* Buscador de libros Gutendex - Issue #20 */
+.book-search {
+  margin: 0 0 20px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
 
+.book-search h2 {
+  margin: 0 0 6px;
+  font-size: 19px;
+}
+
+.book-search p {
+  color: var(--mute);
+  margin: 0 0 12px;
+}
+
+.book-search-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.book-search-form input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+#book-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.book-result {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.book-result h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.book-result p {
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+.book-result.selected {
+  border: 2px solid var(--teal);
+  background: var(--teal-t);
+}
+
+.book-result button {
+  width: 100%;
+}
+
+#book-search-status {
+  margin-top: 12px;
+  min-height: 1.5em;
+  color: var(--mute);
+}
+
+#selected-book {
+  margin-top: 14px;
+  padding: 12px;
+  border-left: 4px solid var(--teal);
+  background: var(--teal-t);
+  border-radius: 6px;
+  color: var(--ink);
+}
+
+@media(max-width:440px) {
+  .book-search-form button {
+    width: 100%;
+  }
+}
 </style>
 </head>
 <body>
@@ -167,7 +255,31 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
   </div>
   <div id="out" class="panel" hidden aria-label="Texto codificado"></div>
   </div>
+<!-- Buscador de libros Gutendex - Issue #20 -->
+<section class="book-search" aria-labelledby="book-search-title">
+  <h2 id="book-search-title">Buscar un libro</h2>
+  <p>Encuentra libros por título, autor o palabra clave usando Gutendex.</p>
 
+  <form id="book-search-form" class="book-search-form">
+    <input
+      type="search"
+      id="book-search-input"
+      placeholder="Ej. Don Quijote, Shakespeare..."
+      aria-label="Buscar libros"
+      required
+    >
+    <button type="submit" id="book-search-button">Buscar</button>
+  </form>
+
+  <p id="book-search-status" role="status" aria-live="polite"></p>
+
+  <div id="book-results" aria-label="Resultados de búsqueda"></div>
+
+  <div id="selected-book" hidden aria-live="polite">
+    <strong>Libro seleccionado:</strong>
+    <p id="selected-book-info"></p>
+  </div>
+</section>
   <div class="seg" role="group" aria-label="Modo"><button id="mc" aria-pressed="true">Comprimir</button><button id="md" aria-pressed="false">Descomprimir</button></div>
   <textarea id="text" aria-label="Texto a analizar">Esto es un ejemplo de compresión</textarea>
   <div id="view" class="panel" hidden></div>
@@ -781,6 +893,113 @@ class HuffmanViz {
 }
 
 new HuffmanViz();
+</script>
+  <script>
+// ========================================
+// BUSCADOR DE LIBROS GUTENDEX - ISSUE #20
+// ========================================
+
+const bookSearchForm = document.getElementById("book-search-form");
+const bookSearchInput = document.getElementById("book-search-input");
+const bookSearchStatus = document.getElementById("book-search-status");
+const bookResults = document.getElementById("book-results");
+const selectedBook = document.getElementById("selected-book");
+const selectedBookInfo = document.getElementById("selected-book-info");
+
+// Guardar el libro seleccionado para futuras funciones
+window.libroGutendexSeleccionado = null;
+
+// Buscar libros en Gutendex
+bookSearchForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const query = bookSearchInput.value.trim();
+
+  if (!query) {
+    bookSearchStatus.textContent = "Escribe un título, autor o palabra clave.";
+    return;
+  }
+
+  bookResults.replaceChildren();
+  selectedBook.hidden = true;
+
+  bookSearchStatus.textContent = "Buscando libros...";
+  const searchButton = document.getElementById("book-search-button");
+  searchButton.disabled = true;
+
+  try {
+    const url = new URL("https://gutendex.com/books/");
+    url.searchParams.set("search", query);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("No se pudo consultar Gutendex.");
+    }
+
+    const data = await response.json();
+
+    if (!data.results || data.results.length === 0) {
+      bookSearchStatus.textContent = "No se encontraron libros. Intenta otra búsqueda.";
+      return;
+    }
+
+    const books = data.results.slice(0, 10);
+
+    bookSearchStatus.textContent =
+      `Se encontraron ${data.count} resultados. Mostrando ${books.length}.`;
+
+    books.forEach((book) => {
+      const card = document.createElement("article");
+      card.className = "book-result";
+
+      const title = document.createElement("h3");
+      title.textContent = book.title;
+
+      const authors = document.createElement("p");
+      authors.textContent = book.authors.length
+        ? "Autor: " + book.authors.map(author => author.name).join(", ")
+        : "Autor desconocido";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "ghost";
+      button.textContent = "Seleccionar libro";
+
+      button.addEventListener("click", () => {
+        // Guardar los datos del libro seleccionado
+        window.libroGutendexSeleccionado = book;
+
+        // Actualizar la interfaz
+        document.querySelectorAll(".book-result").forEach((item) => {
+          item.classList.remove("selected");
+          const itemButton = item.querySelector("button");
+          itemButton.textContent = "Seleccionar libro";
+        });
+
+        card.classList.add("selected");
+        button.textContent = "Libro seleccionado";
+
+        selectedBookInfo.textContent =
+          `${book.title} — ${authors.textContent}`;
+
+        selectedBook.hidden = false;
+
+        bookSearchStatus.textContent = "Libro seleccionado correctamente.";
+      });
+
+      card.append(title, authors, button);
+      bookResults.append(card);
+    });
+
+  } catch (error) {
+    console.error("Error al buscar libros:", error);
+    bookSearchStatus.textContent =
+      "Ocurrió un error al consultar Gutendex. Intenta nuevamente.";
+  } finally {
+    searchButton.disabled = false;
+  }
+});
 </script>
 </body>
 </html>
