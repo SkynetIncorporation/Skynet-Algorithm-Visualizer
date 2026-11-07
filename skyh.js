@@ -304,4 +304,298 @@
     return total;
   }
 
+  // ------------------------------------------------------------
+  // EMPAQUETADO / DESEMPAQUETADO DE BITS (MSB primero)
+  // ------------------------------------------------------------
+
+  /** Codifica los bytes con los códigos y los empaqueta. */
+  function codificar(bytes, codigos, totalBits) {
+    const datos = new Uint8Array(Math.ceil(totalBits / 8));
+    const tablaCodigos = new Array(256);
+    for (const [s, c] of codigos) tablaCodigos[s] = c;
+
+    let acumulador = 0, bitsAcum = 0, pos = 0;
+    for (let i = 0; i < bytes.length; i++) {
+      const c = tablaCodigos[bytes[i]];
+      for (let j = 0; j < c.length; j++) {
+        acumulador = (acumulador << 1) | (c.charCodeAt(j) - 48);
+        if (++bitsAcum === 8) {
+          datos[pos++] = acumulador;
+          acumulador = 0;
+          bitsAcum = 0;
+        }
+      }
+    }
+    if (bitsAcum > 0) datos[pos++] = acumulador << (8 - bitsAcum); // relleno con ceros
+    return datos;
+  }
+
+  /**
+   * Decodifica `totalBits` bits recorriendo el árbol hasta producir
+   * `tamanoOriginal` bytes. Devuelve { bytes, bitsLeidos }.
+   */
+  function decodificar(datos, totalBits, tamanoOriginal, raiz) {
+    const salida = new Uint8Array(tamanoOriginal);
+    if (tamanoOriginal === 0) return { bytes: salida, bitsLeidos: 0 };
+
+    let producidos = 0, bitsLeidos = 0;
+    if (!raiz.izq) { // un solo símbolo: cada bit "0" es una hoja
+      salida.fill(raiz.simbolo);
+      return { bytes: salida, bitsLeidos: totalBits };
+    }
+
+    let nodo = raiz;
+    while (bitsLeidos < totalBits && producidos < tamanoOriginal) {
+      const bit = (datos[bitsLeidos >> 3] >> (7 - (bitsLeidos & 7))) & 1;
+      bitsLeidos++;
+      nodo = bit === 0 ? nodo.izq : nodo.der;
+      if (!nodo.izq) {
+        salida[producidos++] = nodo.simbolo;
+        nodo = raiz;
+      }
+    }
+    return { bytes: salida, bitsLeidos };
+  }
+
+  // ------------------------------------------------------------
+  // ESCRIBIR ARCHIVO .skyh
+  // ------------------------------------------------------------
+
+  /**
+   * Comprime `bytes` y devuelve el contenido del archivo .skyh.
+   * @param {Uint8Array|ArrayBuffer|File|Blob|string} entrada  contenido original
+   * @param {string} nombre  nombre original (ej. "libro.txt")
+   * @returns {Promise<{archivo: Uint8Array, info: object}>}
+   */
+  async function escribirArchivo(entrada, nombre) {
+    const bytes = typeof entrada === "string" ? textoABytes(entrada) : await aBytes(entrada);
+    if (bytes.length > MAX_UINT32) throw new SkyhError("El archivo supera el máximo de 4 GB del formato v1.");
+
+    const frecuencias = calcularFrecuencias(bytes);
+    const tabla = frecuenciasATabla(frecuencias);
+    const raiz = construirArbol(tabla);
+    const codigos = generarCodigos(raiz);
+    const totalBits = contarBits(tabla, codigos);
+    if (totalBits > MAX_UINT32) throw new SkyhError("El total de bits supera el máximo del formato v1.");
+
+    const datos = codificar(bytes, codigos, totalBits);
+    const hash = await sha256(bytes);
+    const nombreBytes = nombreABytes(nombre);
+
+    const offNombre = TAM_HEADER;
+    const offTabla = offNombre + 1 + nombreBytes.length;
+    const offDatos = offTabla + tabla.length * TAM_ENTRADA_TABLA;
+    const archivo = new Uint8Array(offDatos + datos.length);
+    const dv = new DataView(archivo.buffer);
+
+    archivo.set(MAGIC, 0);
+    archivo[4] = VERSION;
+    archivo[5] = 0; // flags
+    dv.setUint32(6, bytes.length, true);
+    dv.setUint32(10, totalBits, true);
+    dv.setUint16(14, tabla.length, true);
+    archivo.set(hash, 16);
+
+    archivo[offNombre] = nombreBytes.length;
+    archivo.set(nombreBytes, offNombre + 1);
+
+    tabla.forEach(({ simbolo, frecuencia }, i) => {
+      const o = offTabla + i * TAM_ENTRADA_TABLA;
+      archivo[o] = simbolo;
+      dv.setUint32(o + 1, frecuencia, true);
+    });
+
+    archivo.set(datos, offDatos);
+
+    const info = armarInfo({
+      version: VERSION, flags: 0,
+      tamanoOriginal: bytes.length, totalBits, hash,
+      nombreOriginal: new TextDecoder().decode(nombreBytes),
+      tabla, raiz, codigos, datos,
+      tamanoComprimido: archivo.length,
+      offsets: { nombre: offNombre, tabla: offTabla, datos: offDatos },
+    });
+    return { archivo, info };
+  }
+
+  function armarInfo(c) {
+    return {
+      ...c,
+      numSimbolos: c.tabla.length,
+      hashHex: aHex(c.hash),
+      metricas: calcularMetricas(c.tamanoOriginal, c.tamanoComprimido),
+      bitsRelleno: (8 - (c.totalBits % 8)) % 8,
+    };
+  }
+
+  // ------------------------------------------------------------
+  // LEER ARCHIVO .skyh (solo inspección, no descomprime)
+  // ------------------------------------------------------------
+
+  /**
+   * Valida y analiza un archivo .skyh. NO decodifica el contenido:
+   * primero se inspecciona y luego se llama a descomprimir(info).
+   * @param {File|Blob|ArrayBuffer|Uint8Array} entrada
+   * @param {string} [nombreArchivo]  nombre del .skyh cargado (si no es File)
+   * @returns {Promise<object>} info
+   */
+  async function leerArchivo(entrada, nombreArchivo) {
+    const nombreCarga = nombreArchivo || (entrada && entrada.name) || "";
+    const arch = await aBytes(entrada);
+
+    // --- Validación (sección 5) ---
+    if (arch.length < TAM_HEADER + 1) {
+      throw new SkyhError("Archivo demasiado pequeño: no contiene un header .skyh completo.");
+    }
+    if (!iguales(arch.subarray(0, 4), MAGIC)) {
+      throw new SkyhError('Magic inválido: el archivo no empieza con "SKYH".');
+    }
+    const dv = new DataView(arch.buffer, arch.byteOffset, arch.byteLength);
+    const version = arch[4];
+    if (version !== VERSION) {
+      throw new SkyhError(`Versión no soportada: ${version} (se esperaba ${VERSION}).`);
+    }
+
+    const flags = arch[5];
+    const tamanoOriginal = dv.getUint32(6, true);
+    const totalBits = dv.getUint32(10, true);
+    const n = dv.getUint16(14, true);
+    if (n > 256) throw new SkyhError(`Número de símbolos inválido: ${n} (máximo 256).`);
+    const hash = arch.slice(16, 48);
+
+    const largoNombre = arch[TAM_HEADER];
+    const offNombre = TAM_HEADER;
+    const offTabla = offNombre + 1 + largoNombre;
+    const offDatos = offTabla + n * TAM_ENTRADA_TABLA;
+    const tamDatos = Math.ceil(totalBits / 8);
+    const tamanoEsperado = offDatos + tamDatos;
+
+    if (arch.length !== tamanoEsperado) {
+      throw new SkyhError(
+          `Tamaño inconsistente: el archivo mide ${arch.length} B y el header indica ${tamanoEsperado} B. ` +
+          "Puede estar truncado o corrupto."
+      );
+    }
+
+    const nombreOriginal = bytesATexto(arch.subarray(offNombre + 1, offNombre + 1 + largoNombre));
+
+    // --- Tabla de frecuencias ---
+    const tabla = [];
+    let suma = 0, previo = -1;
+    for (let i = 0; i < n; i++) {
+      const o = offTabla + i * TAM_ENTRADA_TABLA;
+      const simbolo = arch[o];
+      const frecuencia = dv.getUint32(o + 1, true);
+      if (simbolo <= previo) throw new SkyhError("La tabla de frecuencias no está ordenada o repite símbolos.");
+      if (frecuencia === 0) throw new SkyhError(`El símbolo ${simbolo} tiene frecuencia 0.`);
+      previo = simbolo;
+      suma += frecuencia;
+      tabla.push({ simbolo, frecuencia });
+    }
+    if (suma !== tamanoOriginal) {
+      throw new SkyhError(`La suma de frecuencias (${suma}) no coincide con el tamaño original (${tamanoOriginal}).`);
+    }
+
+    // --- Reconstrucción del árbol y códigos (mismo desempate) ---
+    const raiz = construirArbol(tabla);
+    const codigos = generarCodigos(raiz);
+    const bitsEsperados = contarBits(tabla, codigos);
+    if (bitsEsperados !== totalBits) {
+      throw new SkyhError(`Total de bits inconsistente: el header dice ${totalBits} y la tabla implica ${bitsEsperados}.`);
+    }
+
+    return armarInfo({
+      version, flags, tamanoOriginal, totalBits, hash,
+      nombreOriginal, nombreArchivo: nombreCarga,
+      tabla, raiz, codigos,
+      datos: arch.subarray(offDatos),
+      tamanoComprimido: arch.length,
+      offsets: { nombre: offNombre, tabla: offTabla, datos: offDatos },
+    });
+  }
+
+  // ------------------------------------------------------------
+  // DESCOMPRIMIR + INTEGRIDAD
+  // ------------------------------------------------------------
+
+  /**
+   * Decodifica el contenido de un `info` devuelto por leerArchivo/escribirArchivo
+   * y verifica el SHA-256 contra el almacenado en el header.
+   * @returns {Promise<{bytes: Uint8Array, hashCalculado: string, integro: boolean}>}
+   */
+  async function descomprimir(info) {
+    const { bytes, bitsLeidos } = decodificar(info.datos, info.totalBits, info.tamanoOriginal, info.raiz);
+    if (info.tamanoOriginal > 0 && info.raiz.izq && bitsLeidos !== info.totalBits) {
+      throw new SkyhError("Los datos terminaron antes de producir el tamaño original: archivo corrupto.");
+    }
+    const hashCalculado = aHex(await sha256(bytes));
+    return { bytes, hashCalculado, integro: hashCalculado === info.hashHex };
+  }
+
+  // ------------------------------------------------------------
+  // AYUDAS PARA EL INSPECTOR Y LA INTERFAZ
+  // ------------------------------------------------------------
+
+  /** Vista parcial legible de los datos comprimidos (hex y bits). */
+  function vistaPreviaDatos(info, maxBytes) {
+    const n = Math.min(maxBytes || 32, info.datos.length);
+    const trozo = info.datos.subarray(0, n);
+    const hex = Array.from(trozo, (b) => b.toString(16).padStart(2, "0").toUpperCase());
+    const bits = Array.from(trozo, (b) => b.toString(2).padStart(8, "0"));
+    return {
+      hex: hex.join(" "),
+      bits: bits.join(" "),
+      bytesMostrados: n,
+      bytesTotales: info.datos.length,
+      truncado: n < info.datos.length,
+    };
+  }
+
+  /** Etiqueta visible de un símbolo (byte). */
+  function etiquetaSimbolo(s) {
+    if (s === 32) return "␣";
+    if (s === 10) return "↵";
+    if (s === 13) return "⏎";
+    if (s === 9) return "⇥";
+    if (s > 32 && s < 127) return String.fromCharCode(s);
+    return "0x" + s.toString(16).toUpperCase().padStart(2, "0");
+  }
+
+  /** Dispara la descarga de un Uint8Array en el navegador. */
+  function descargar(bytes, nombre, tipoMime) {
+    const blob = new Blob([bytes], { type: tipoMime || "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nombre;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  /** "libro.txt" → "libro.skyh" */
+  function nombreSkyh(nombreOriginal) {
+    const base = (nombreOriginal || "archivo").replace(/\.[^.]*$/, "");
+    return (base || "archivo") + ".skyh";
+  }
+
+  // ------------------------------------------------------------
+  // EXPORTACIÓN
+  // ------------------------------------------------------------
+  const Skyh = {
+    // Formato
+    MAGIC, VERSION, TAM_HEADER, SkyhError,
+    // Archivo
+    escribirArchivo, leerArchivo, descomprimir,
+    // Pasos de Huffman (para la visualización)
+    calcularFrecuencias, frecuenciasATabla, construirArbol, generarCodigos,
+    codificar, decodificar, ColaPrioridad,
+    // Ayudas
+    calcularMetricas, formatearTamano, vistaPreviaDatos, etiquetaSimbolo,
+    textoABytes, bytesATexto, aHex, sha256, descargar, nombreSkyh,
+  };
+
+  if (typeof module !== "undefined" && module.exports) module.exports = Skyh;
+  global.Skyh = Skyh;
 })(typeof globalThis !== "undefined" ? globalThis : this);
