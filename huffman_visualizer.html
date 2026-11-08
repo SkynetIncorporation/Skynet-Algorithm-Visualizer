@@ -109,6 +109,7 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
       <div id="tin"><svg id="arrows" width="0" height="0"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker></defs></svg></div>
     </div>
     <div id="out" class="panel" hidden aria-label="Texto codificado"></div>
+    <div id="stats" class="panel" hidden aria-label="Estadísticas de compresión"></div>
   </div>
 
   <div class="seg" role="group" aria-label="Modo"><button id="mc" aria-pressed="true">Comprimir</button><button id="md" aria-pressed="false">Descomprimir</button></div>
@@ -134,7 +135,7 @@ class HuffmanViz {
   #text; #view; #stack; #status; #start; #next; #reset; #speed;
   #downloadTxt; #downloadSkyh;
   #ptr = null; #cells = []; #boxes = new Map(); #token = 0;
-  #tree; #tin; #arrows; #out; #mc; #md; #sub; #mode = "c"; #busy = false; #dActive = false; #ctext = ""; #chars = []; #codes = new Map(); #nodes = []; #queue = []; #stage = 0;
+  #tree; #tin; #arrows; #out; #stats; #mc; #md; #sub; #mode = "c"; #busy = false; #dActive = false; #ctext = ""; #chars = []; #codes = new Map(); #nodes = []; #queue = []; #stage = 0;
 
   constructor() {
     const g = id => document.getElementById(id);
@@ -143,7 +144,8 @@ class HuffmanViz {
     this.#reset = g("reset"); this.#speed = g("speed");
     this.#downloadTxt = g("downloadTxt");
     this.#downloadSkyh = g("downloadSkyh");
-    this.#tree = g("tree"); this.#tin = g("tin"); this.#arrows = g("arrows"); this.#out = g("out");
+    this.#tree = g("tree"); this.#tin = g("tin"); this.#arrows = g("arrows");
+    this.#out = g("out"); this.#stats = g("stats");
     this.#mc = g("mc"); this.#md = g("md"); this.#sub = g("sub");
     this.#mc.onclick = () => this.#setMode("c");
     this.#md.onclick = () => this.#setMode("d");
@@ -300,6 +302,8 @@ class HuffmanViz {
   }
 
   #clearTree() {
+    this.#stats.hidden = true;
+    this.#stats.innerHTML = "";
     this.#nodes = []; this.#queue = []; this.#stage = 0;
     this.#tree.hidden = true;
     this.#out.hidden = true; this.#out.innerHTML = ""; this.#codes.clear();
@@ -412,6 +416,23 @@ class HuffmanViz {
       if (i > 0) { this.#layout(); await this.#tween(step * 1.2, t); }
     }
     this.#status.textContent = `Árbol de Huffman completo: la raíz suma ${q[0].w}.`;
+  }
+    #showStats(bits) {
+    const original = this.#chars.length * 8;
+    const saved = original - bits;
+    const percentage = original > 0
+      ? ((saved / original) * 100).toFixed(2)
+      : "0.00";
+
+    this.#stats.hidden = false;
+    this.#stats.innerHTML = `
+      <h3>Estadísticas de compresión</h3>
+      <p>Caracteres originales: <strong>${this.#chars.length}</strong></p>
+      <p>Tamaño original: <strong>${original} bits</strong></p>
+      <p>Tamaño comprimido: <strong>${bits} bits</strong></p>
+      <p>Reducción de tamaño: <strong>${percentage}%</strong></p>
+      <p>Bits ahorrados: <strong>${saved}</strong></p>
+    `;
   }
 
   #sync() {
@@ -683,6 +704,7 @@ class HuffmanViz {
       bits += code.length;
     }
     this.#status.textContent = `Texto codificado: ${bits} bits en lugar de ${n * 8} (8 bits por carácter).`;
+    this.#showStats(bits);
   }
 
   async #codePhase(t) {
