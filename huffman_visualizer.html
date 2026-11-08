@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -33,7 +32,7 @@ h1{font-size:26px;margin:0 0 4px;font-weight:600;letter-spacing:-.01em}
 .sub{margin:0 0 20px;color:var(--mute)}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
 #stack{display:flex;gap:12px;align-items:flex-start;overflow-x:auto;position:relative;min-height:170px;padding:12px 4px 10px;margin-bottom:16px}
-#stack:empty::before{content:"Las cajas de frecuencia irán apareciendo aquí.";color:var(--mute);align-self:center;padding-left:8px}
+#stack:empty{display:none}
 .box{flex:none;width:68px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .count{font:600 18px "JetBrains Mono",ui-monospace,monospace;height:26px;opacity:0;transition:opacity .3s}
 .counting .count{opacity:1}
@@ -47,6 +46,31 @@ h1{font-size:26px;margin:0 0 4px;font-weight:600;letter-spacing:-.01em}
 .cell.nl{color:var(--mute);font-size:14px}
 #ptr{position:absolute;left:0;top:0;width:32px;height:32px;border:2px solid var(--amber);border-radius:4px;pointer-events:none;transition:transform .2s ease}
 .fly{position:fixed;z-index:50;transform-origin:0 0;text-align:center;font:600 20px "JetBrains Mono",ui-monospace,monospace;line-height:32px;color:var(--amber);pointer-events:none}
+
+.file-picker{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px;
+  margin:0 0 12px;
+  padding:12px;
+  border:1px dashed var(--line);
+  border-radius:10px;
+  background:var(--panel);
+}
+.file-picker label{font-weight:600;color:var(--ink)}
+.file-picker input[type="file"]{
+  max-width:100%;
+  color:var(--mute);
+  font:14px "Instrument Sans",system-ui,sans-serif;
+}
+.file-info{
+  flex-basis:100%;
+  color:var(--mute);
+  font-size:13px;
+  overflow-wrap:anywhere;
+}
+
 textarea{display:block;width:100%;min-height:120px;resize:vertical;margin-bottom:16px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);font:400 17px/1.5 "JetBrains Mono",ui-monospace,monospace}
 textarea:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -72,6 +96,9 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
 #row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
 #row #tree{flex:1 1 420px;min-width:0}
 #out{flex:0 1 260px;min-height:96px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+#stats{flex:0 1 260px;margin-bottom:16px}
+#stats h3{margin:0 0 8px;font-size:16px}
+#stats p{margin:0 0 4px;font-size:14px}
 .obox{min-width:30px;height:28px;padding:0 7px;border-radius:6px;background:var(--teal-t);color:var(--ink);box-shadow:inset 0 0 0 2px var(--teal);font:600 14px "JetBrains Mono",ui-monospace,monospace;display:flex;align-items:center;justify-content:center}
 .cbox.fixed{position:fixed;z-index:60;pointer-events:none}
 .seg{display:inline-flex;margin-bottom:12px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
@@ -84,14 +111,117 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
 .workflow-number{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--teal);color:var(--on-teal);font:600 13px "JetBrains Mono",ui-monospace,monospace}
 .workflow-step strong{font-size:14px;line-height:1.25}
 .workflow-step span:last-child{font-size:12px;color:var(--mute);line-height:1.35}
-@media(max-width:760px){.workflow{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:440px){.workflow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+  .workflow{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:440px){
+  .workflow{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Buscador de libros Gutendex - Issue #20 */
+.book-search {
+  margin: 0 0 20px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.book-search h2 {
+  margin: 0 0 6px;
+  font-size: 19px;
+}
+
+.book-search p {
+  color: var(--mute);
+  margin: 0 0 12px;
+}
+
+.book-search-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.book-search-form input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+#book-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.book-result {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.book-result h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.book-result p {
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+.book-result.selected {
+  border: 2px solid var(--teal);
+  background: var(--teal-t);
+}
+
+.book-result button {
+  width: 100%;
+}
+
+#book-search-status {
+  margin-top: 12px;
+  min-height: 1.5em;
+  color: var(--mute);
+}
+
+#selected-book {
+  margin-top: 14px;
+  padding: 12px;
+  border-left: 4px solid var(--teal);
+  background: var(--teal-t);
+  border-radius: 6px;
+  color: var(--ink);
+}
+
+@media(max-width:440px) {
+  .book-search-form button {
+    width: 100%;
+  }
+}
+
+/* Etapa 1: tres secciones de entrada (texto, archivo, libro) */
+#inputs{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
+.input-card{padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.input-card h2{margin:0 0 10px;font-size:19px}
+.input-card textarea{margin-bottom:8px}
+.input-card .file-info{margin:0}
+.input-card .file-picker{margin:0}
+#inputs .book-search{margin:0}
+.tag{display:inline-grid;place-items:center;min-width:34px;height:24px;padding:0 6px;margin-right:6px;border-radius:6px;background:var(--teal);color:var(--on-teal);font:600 13px "JetBrains Mono",ui-monospace,monospace;vertical-align:middle}
 </style>
 </head>
 <body>
 <main>
   <h1>Huffman paso a paso</h1>
-  <p class="sub" id="sub">Escribe un texto y observa cómo se cuentan sus caracteres.</p>
+  <p class="sub" id="sub">Etapa 1: escribe un texto, elige un archivo .txt o busca un libro. Después pulsa Siguiente.</p>
 
   <section class="workflow" aria-label="Etapas del proceso de compresión Huffman">
     <article class="workflow-step active"><span class="workflow-number">01</span><strong>Buscar / Subir</strong><span>Seleccionar el texto que se desea comprimir.</span></article>
@@ -102,8 +232,51 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
     <article class="workflow-step"><span class="workflow-number">06</span><strong>Descargar / Descomprimir</strong><span>Obtener el resultado o recuperar el texto original.</span></article>
   </section>
 
-  <div id="stack" class="panel" aria-label="Cajas de frecuencia"></div>
+  <div class="seg" role="group" aria-label="Modo"><button id="mc" aria-pressed="true">Comprimir</button><button id="md" aria-pressed="false">Descomprimir</button></div>
 
+  <!-- Etapa 1: tres fuentes de entrada, cada una en su propia sección -->
+  <div id="inputs">
+    <section class="input-card" id="sec-text" aria-labelledby="sec-text-title">
+      <h2 id="sec-text-title"><span class="tag">1A</span> <span id="sec-text-label">Escribir texto</span></h2>
+  <textarea id="text" aria-label="Texto a analizar">Esto es un ejemplo de compresión</textarea>
+      <p id="sourceInfo" class="file-info" aria-live="polite">Fuente actual: texto escrito.</p>
+    </section>
+    <section class="input-card" id="sec-file" aria-labelledby="sec-file-title">
+      <h2 id="sec-file-title"><span class="tag">1B</span> Elegir archivo</h2>
+  <div class="file-picker">
+    <label for="fileInput">Cargar archivo de texto (.txt)</label>
+    <input id="fileInput" type="file" accept=".txt,text/plain">
+    <span id="fileInfo" class="file-info" aria-live="polite">No se ha seleccionado ningún archivo.</span>
+  </div>
+    </section>
+<section class="book-search" id="sec-book" aria-labelledby="book-search-title">
+  <h2 id="book-search-title"><span class="tag">1C</span> Buscar un libro</h2>
+  <p>Encuentra libros por título, autor o palabra clave usando Gutendex.</p>
+
+  <form id="book-search-form" class="book-search-form">
+    <input
+      type="search"
+      id="book-search-input"
+      placeholder="Ej. Don Quijote, Shakespeare..."
+      aria-label="Buscar libros"
+      required
+    >
+    <button type="submit" id="book-search-button">Buscar</button>
+  </form>
+
+  <p id="book-search-status" role="status" aria-live="polite"></p>
+
+  <div id="book-results" aria-label="Resultados de búsqueda"></div>
+
+  <div id="selected-book" hidden aria-live="polite">
+    <strong>Libro seleccionado:</strong>
+    <p id="selected-book-info"></p>
+  </div>
+</section>
+  </div>
+
+  <!-- Etapa 2: las cajas de frecuencia aparecen al pulsar Siguiente -->
+  <div id="stack" class="panel" aria-label="Cajas de frecuencia"></div>
   <div id="row">
     <div id="tree" class="panel" hidden aria-label="Nodos y árbol de Huffman">
       <div id="tin"><svg id="arrows" width="0" height="0"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker></defs></svg></div>
@@ -111,9 +284,6 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
     <div id="out" class="panel" hidden aria-label="Texto codificado"></div>
     <div id="stats" class="panel" hidden aria-label="Estadísticas de compresión"></div>
   </div>
-
-  <div class="seg" role="group" aria-label="Modo"><button id="mc" aria-pressed="true">Comprimir</button><button id="md" aria-pressed="false">Descomprimir</button></div>
-  <textarea id="text" aria-label="Texto a analizar">Esto es un ejemplo de compresión</textarea>
   <div id="view" class="panel" hidden></div>
 
   <div class="bar">
@@ -127,13 +297,21 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
   <p id="status" aria-live="polite"></p>
 </main>
 
+<!-- Biblioteca del formato binario .skyh: debe cargarse antes de instanciar HuffmanViz -->
+<script src="skyh.js"></script>
 <script>
 const CANCEL = Symbol("cancel");
+// Por encima de este número de caracteres no se anima el conteo uno por uno (p. ej. un libro completo).
+const MAX_ANIM = 1500;
 const label = c => c === " " ? "␣" : c === "\n" ? "↵" : c === "\t" ? "⇥" : c;
 
 class HuffmanViz {
-  #text; #view; #stack; #status; #start; #next; #reset; #speed;
+  #text; #view; #stack; #status; #start; #next; #reset; #speed; #fileInput; #fileInfo;
   #downloadTxt; #downloadSkyh;
+  #inputs; #sourceInfo; #secFile; #secBook; #secTextLabel; #steps; #loading = false;
+  #fileBytes = new Uint8Array(); #fileName = "";
+  // Texto completo de la última compresión (para estadísticas y descargas) y su origen.
+  #allChars = []; #srcBytes = new Uint8Array(); #srcName = "texto.txt";
   #ptr = null; #cells = []; #boxes = new Map(); #token = 0;
   #tree; #tin; #arrows; #out; #stats; #mc; #md; #sub; #mode = "c"; #busy = false; #dActive = false; #ctext = ""; #chars = []; #codes = new Map(); #nodes = []; #queue = []; #stage = 0;
 
@@ -144,8 +322,20 @@ class HuffmanViz {
     this.#reset = g("reset"); this.#speed = g("speed");
     this.#downloadTxt = g("downloadTxt");
     this.#downloadSkyh = g("downloadSkyh");
-    this.#tree = g("tree"); this.#tin = g("tin"); this.#arrows = g("arrows");
-    this.#out = g("out"); this.#stats = g("stats");
+    this.#fileInput = g("fileInput"); this.#fileInfo = g("fileInfo");
+    this.#fileInput.addEventListener("change", () => this.#loadFile());
+    this.#inputs = g("inputs"); this.#sourceInfo = g("sourceInfo");
+    this.#secFile = g("sec-file"); this.#secBook = g("sec-book"); this.#secTextLabel = g("sec-text-label");
+    this.#steps = [...document.querySelectorAll(".workflow-step")];
+    // Si el usuario escribe a mano, la fuente vuelve a ser el texto escrito.
+    this.#text.addEventListener("input", () => {
+      this.#fileName = "";
+      if (this.#mode === "c") this.#sourceInfo.textContent = "Fuente actual: texto escrito.";
+    });
+    // El buscador de libros avisa mientras descarga el texto para bloquear Siguiente.
+    document.addEventListener("source-loading", e => { this.#loading = e.detail; this.#sync(); });
+    this.#tree = g("tree"); this.#tin = g("tin"); this.#arrows = g("arrows"); this.#out = g("out");
+    this.#stats = g("stats");
     this.#mc = g("mc"); this.#md = g("md"); this.#sub = g("sub");
     this.#mc.onclick = () => this.#setMode("c");
     this.#md.onclick = () => this.#setMode("d");
@@ -157,6 +347,45 @@ class HuffmanViz {
     this.#sync();
   }
 
+  async #loadFile() {
+    const file = this.#fileInput.files?.[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".txt")) {
+      this.#fileInfo.textContent = "Selecciona un archivo con extensión .txt.";
+      this.#status.textContent = "Formato no válido. Solo se permiten archivos .txt.";
+      this.#fileInput.value = "";
+      return;
+    }
+
+    try {
+      // Se leen los bytes originales del archivo y se conservan en un Uint8Array.
+      this.#fileBytes = new Uint8Array(await file.arrayBuffer());
+
+      // La visualización actual trabaja con texto; por eso decodificamos los bytes UTF-8.
+      const content = new TextDecoder("utf-8", { fatal: true }).decode(this.#fileBytes);
+
+      this.#restore();
+      this.#text.value = content; // el cuadro de texto se reemplaza por el contenido del archivo
+      this.#ctext = content;
+      this.#fileName = file.name;
+      this.#fileInfo.textContent =
+        `${file.name} · ${this.#fileBytes.length.toLocaleString("es-MX")} bytes`;
+      this.#sourceInfo.textContent = `Fuente actual: archivo ${file.name}.`;
+      this.#status.textContent =
+        `Archivo cargado correctamente: ${this.#fileBytes.length} bytes leídos en un Uint8Array. Pulsa Siguiente para analizar el texto.`;
+      this.#inputs.hidden = false;
+      this.#view.hidden = true;
+    } catch (error) {
+      this.#fileBytes = new Uint8Array();
+      this.#fileName = "";
+      this.#fileInput.value = "";
+      this.#fileInfo.textContent = "No se pudo leer el archivo como texto UTF-8.";
+      this.#status.textContent =
+        "Error al cargar el archivo. Verifica que sea un .txt codificado en UTF-8.";
+    }
+  }
+
   get #step() { return 1200 / Number(this.#speed.value); }
 
   #sleep(ms, t) {
@@ -164,7 +393,7 @@ class HuffmanViz {
   }
 
   #build(chars) {
-    this.#text.hidden = true;
+    this.#inputs.hidden = true;
     this.#view.hidden = false;
     this.#view.innerHTML = "";
     this.#stack.innerHTML = "";
@@ -214,20 +443,32 @@ class HuffmanViz {
 
   async #run() {
     if (this.#mode === "d") return this.#runDecomp();
-    const chars = [...this.#text.value];
-    if (!chars.length) {
+    const all = [...this.#text.value];
+    if (!all.length) {
       this.#status.textContent = "Escribe un texto para empezar.";
       this.#text.focus();
       return;
     }
+    // Se conserva el texto completo y sus bytes originales para las estadísticas y las descargas.
+    this.#allChars = all;
+    this.#srcName = this.#fileName || "texto.txt";
+    this.#srcBytes = this.#fileName && this.#fileBytes.length
+      ? this.#fileBytes
+      : new TextEncoder().encode(all.join(""));
+    const big = all.length > MAX_ANIM;
+    const chars = big ? all.slice(0, MAX_ANIM) : all;
     const t = ++this.#token;
     this.#build(chars);
     this.#next.disabled = true;
     this.#busy = true;
     this.#sync();
     try {
-      await this.#countPhase(chars, t);
-      await this.#clearPhase(t);
+      if (big) {
+        await this.#fastCount(all, t);
+      } else {
+        await this.#countPhase(chars, t);
+        await this.#clearPhase(t);
+      }
     } catch (e) {
       if (e !== CANCEL) throw e;
     } finally {
@@ -275,6 +516,25 @@ class HuffmanViz {
       }
       cell.classList.add("seen");
     }
+  }
+
+  // Textos largos (libros): se cuentan todos los caracteres de golpe, sin animar cada uno.
+  async #fastCount(all, t) {
+    this.#status.textContent = `Etapa 2: contando ${all.length.toLocaleString("es-MX")} caracteres…`;
+    await this.#sleep(this.#step * 0.5, t);
+    const freq = new Map();
+    for (const ch of all) freq.set(ch, (freq.get(ch) || 0) + 1);
+    for (const [ch, n] of freq) {
+      const box = this.#newBox(ch);
+      box.n = n;
+      box.count.textContent = n;
+    }
+    this.#stack.classList.add("counting");
+    this.#status.textContent =
+      `Listo: ${freq.size} caracteres distintos en ${all.length.toLocaleString("es-MX")} en total. ` +
+      `Texto largo: las frecuencias son de todo el texto, pero la codificación (etapa 6) se animará solo con los primeros ${MAX_ANIM} caracteres. Pulsa Siguiente para continuar.`;
+    this.#stage = 2;
+    this.#next.disabled = false;
   }
 
   async #clearPhase(t) {
@@ -417,8 +677,13 @@ class HuffmanViz {
     }
     this.#status.textContent = `Árbol de Huffman completo: la raíz suma ${q[0].w}.`;
   }
-    #showStats(bits) {
-    const original = this.#chars.length * 8;
+
+  // Estadísticas de compresión calculadas sobre el texto completo (no solo la parte animada).
+  #showStats() {
+    const total = this.#allChars.length;
+    let bits = 0;
+    for (const ch of this.#allChars) bits += this.#codes.get(ch)?.code.length ?? 0;
+    const original = total * 8;
     const saved = original - bits;
     const percentage = original > 0
       ? ((saved / original) * 100).toFixed(2)
@@ -427,28 +692,43 @@ class HuffmanViz {
     this.#stats.hidden = false;
     this.#stats.innerHTML = `
       <h3>Estadísticas de compresión</h3>
-      <p>Caracteres originales: <strong>${this.#chars.length}</strong></p>
-      <p>Tamaño original: <strong>${original} bits</strong></p>
-      <p>Tamaño comprimido: <strong>${bits} bits</strong></p>
+      <p>Caracteres originales: <strong>${total.toLocaleString("es-MX")}</strong></p>
+      <p>Tamaño original: <strong>${original.toLocaleString("es-MX")} bits</strong></p>
+      <p>Tamaño comprimido: <strong>${bits.toLocaleString("es-MX")} bits</strong></p>
       <p>Reducción de tamaño: <strong>${percentage}%</strong></p>
-      <p>Bits ahorrados: <strong>${saved}</strong></p>
+      <p>Bits ahorrados: <strong>${saved.toLocaleString("es-MX")}</strong></p>
     `;
   }
 
   #sync() {
     const lock = this.#busy || (this.#stage > 0 && this.#stage < 6), d = this.#mode === "d";
     this.#mc.disabled = lock; this.#md.disabled = lock;
+    this.#fileInput.disabled = lock || d;
+    this.#start.hidden = !d; // en modo comprimir se avanza solo con Siguiente
     this.#start.disabled = this.#busy || (!d && this.#stage > 0 && this.#stage < 6);
     this.#reset.disabled = !(this.#busy || (d ? this.#dActive : this.#stage > 0));
+    this.#secFile.hidden = d; this.#secBook.hidden = d;
     if (d) this.#next.disabled = true;
+    else if (!this.#busy && this.#stage === 0) this.#next.disabled = this.#loading;
+    // Resalta la etapa del flujo en la que estamos.
+    const s = this.#stage;
+    const step = this.#busy && s === 0 ? 2 : s === 0 ? 1 : s <= 2 ? 2 : s <= 5 ? 3 : 4;
+    this.#steps.forEach((el, i) => el.classList.toggle("active", i === step - 1));
 
+    // Las descargas solo se habilitan cuando la compresión terminó (etapa 6) y no hay animación en curso.
     const canDownload = !this.#busy && !d && this.#stage === 6;
     this.#downloadTxt.disabled = !canDownload;
     this.#downloadSkyh.disabled = !canDownload;
   }
 
+  // Bits de la parte animada (los que se ven en pantalla); se usan al pasar a "Descomprimir".
   #getEncodedBits() {
     return this.#chars.map(ch => this.#codes.get(ch)?.code ?? "").join("");
+  }
+
+  // Bits de todo el texto comprimido; se usan en la descarga .txt.
+  #getFullBits() {
+    return this.#allChars.map(ch => this.#codes.get(ch)?.code ?? "").join("");
   }
 
   #downloadFile(content, filename, type) {
@@ -465,44 +745,30 @@ class HuffmanViz {
 
   #downloadText() {
     if (this.#stage !== 6 || this.#mode !== "c" || this.#busy) return;
-    const bits = this.#getEncodedBits();
     this.#downloadFile(
-      bits,
+      this.#getFullBits(),
       "texto_comprimido.txt",
       "text/plain;charset=utf-8"
     );
     this.#status.textContent = "Archivo TXT descargado correctamente.";
   }
 
-  #downloadSkyhFile() {
+  // Genera un archivo binario .skyh válido con Skyh.escribirArchivo() (skyh.js).
+  async #downloadSkyhFile() {
     if (this.#stage !== 6 || this.#mode !== "c" || this.#busy) return;
-
-    const bits = this.#getEncodedBits();
-
-    const data = {
-      format: "SKYH",
-      version: 1,
-      algorithm: "Huffman",
-      originalLength: this.#chars.length,
-      bitLength: bits.length,
-      bits,
-      frequencies: [...this.#boxes.entries()].map(([character, box]) => ({
-        character,
-        frequency: box.n
-      })),
-      codes: [...this.#codes.entries()].map(([character, data]) => ({
-        character,
-        code: data.code
-      }))
-    };
-
-    this.#downloadFile(
-      JSON.stringify(data, null, 2),
-      "texto_comprimido.skyh",
-      "application/json;charset=utf-8"
-    );
-
-    this.#status.textContent = "Archivo SKYH descargado correctamente.";
+    if (typeof Skyh === "undefined") {
+      this.#status.textContent = "No se pudo cargar skyh.js. Colócalo en la misma carpeta que el HTML.";
+      return;
+    }
+    try {
+      const { archivo, info } = await Skyh.escribirArchivo(this.#srcBytes, this.#srcName);
+      Skyh.descargar(archivo, Skyh.nombreSkyh(this.#srcName));
+      this.#status.textContent =
+        `Archivo SKYH descargado correctamente: ${info.metricas.textoOriginal} → ${info.metricas.textoComprimido}.`;
+    } catch (error) {
+      console.error("Error al generar el archivo .skyh:", error);
+      this.#status.textContent = "No se pudo generar el archivo .skyh: " + (error.message || error);
+    }
   }
 
   #cleanD() {
@@ -518,8 +784,10 @@ class HuffmanViz {
     this.#mc.setAttribute("aria-pressed", m === "c");
     this.#md.setAttribute("aria-pressed", m === "d");
     this.#view.hidden = true;
-    this.#text.hidden = false;
+    this.#inputs.hidden = false;
     this.#next.disabled = true;
+    this.#secTextLabel.textContent = m === "d" ? "Secuencia binaria" : "Escribir texto";
+    this.#sourceInfo.hidden = m === "d";
     if (m === "d") {
       this.#ctext = this.#text.value;
       const ready = this.#stage === 6;
@@ -532,7 +800,7 @@ class HuffmanViz {
       this.#text.value = this.#ctext;
       this.#text.placeholder = "";
       this.#text.setAttribute("aria-label", "Texto a analizar");
-      this.#sub.textContent = "Escribe un texto y observa cómo se cuentan sus caracteres.";
+      this.#sub.textContent = "Etapa 1: escribe un texto, elige un archivo .txt o busca un libro. Después pulsa Siguiente.";
       this.#status.textContent = "";
     }
     this.#sync();
@@ -546,7 +814,7 @@ class HuffmanViz {
     const bits = [...raw], t = ++this.#token;
     this.#cleanD();
     this.#dActive = true; this.#busy = true;
-    this.#text.hidden = true; this.#view.hidden = false;
+    this.#inputs.hidden = true; this.#view.hidden = false;
     this.#view.innerHTML = ""; this.#out.innerHTML = ""; this.#view.scrollTop = 0;
     this.#cells = bits.map(b => {
       const s = document.createElement("span");
@@ -573,7 +841,7 @@ class HuffmanViz {
     this.#cleanD();
     this.#out.innerHTML = "";
     this.#view.hidden = true;
-    this.#text.hidden = false;
+    this.#inputs.hidden = false;
     this.#status.textContent = "";
     this.#sync();
   }
@@ -704,7 +972,7 @@ class HuffmanViz {
       bits += code.length;
     }
     this.#status.textContent = `Texto codificado: ${bits} bits en lugar de ${n * 8} (8 bits por carácter).`;
-    this.#showStats(bits);
+    this.#showStats();
   }
 
   async #codePhase(t) {
@@ -763,6 +1031,7 @@ class HuffmanViz {
   }
 
   async #advance() {
+    if (this.#stage === 0) return this.#run(); // Etapa 1 → 2: analizar y mostrar las cajas de frecuencia
     const t = this.#token;
     this.#next.disabled = true;
     this.#busy = true;
@@ -805,7 +1074,7 @@ class HuffmanViz {
     this.#cells = [];
     this.#clearTree();
     this.#view.hidden = true;
-    this.#text.hidden = false;
+    this.#inputs.hidden = false;
     this.#start.disabled = false;
     this.#next.disabled = true;
     this.#reset.disabled = true;
@@ -815,6 +1084,171 @@ class HuffmanViz {
 }
 
 new HuffmanViz();
+</script>
+  <script>
+// ========================================
+// BUSCADOR DE LIBROS GUTENDEX - ISSUE #20
+// ========================================
+
+const bookSearchForm = document.getElementById("book-search-form");
+const bookSearchInput = document.getElementById("book-search-input");
+const bookSearchStatus = document.getElementById("book-search-status");
+const bookResults = document.getElementById("book-results");
+const selectedBook = document.getElementById("selected-book");
+const selectedBookInfo = document.getElementById("selected-book-info");
+
+// Guardar el libro seleccionado para futuras funciones
+window.libroGutendexSeleccionado = null;
+
+// Buscar libros en Gutendex
+bookSearchForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const query = bookSearchInput.value.trim();
+
+  if (!query) {
+    bookSearchStatus.textContent = "Escribe un título, autor o palabra clave.";
+    return;
+  }
+
+  bookResults.replaceChildren();
+  selectedBook.hidden = true;
+
+  bookSearchStatus.textContent = "Buscando libros...";
+  const searchButton = document.getElementById("book-search-button");
+  searchButton.disabled = true;
+
+  try {
+    const url = new URL("https://gutendex.com/books/");
+    url.searchParams.set("search", query);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("No se pudo consultar Gutendex.");
+    }
+
+    const data = await response.json();
+
+    if (!data.results || data.results.length === 0) {
+      bookSearchStatus.textContent = "No se encontraron libros. Intenta otra búsqueda.";
+      return;
+    }
+
+    const books = data.results.slice(0, 10);
+
+    bookSearchStatus.textContent =
+      `Se encontraron ${data.count} resultados. Mostrando ${books.length}.`;
+
+    books.forEach((book) => {
+      const card = document.createElement("article");
+      card.className = "book-result";
+
+      const title = document.createElement("h3");
+      title.textContent = book.title;
+
+      const authors = document.createElement("p");
+      authors.textContent = book.authors.length
+        ? "Autor: " + book.authors.map(author => author.name).join(", ")
+        : "Autor desconocido";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "ghost";
+      button.textContent = "Seleccionar libro";
+
+      button.addEventListener("click", () => {
+        // Guardar los datos del libro seleccionado
+        window.libroGutendexSeleccionado = book;
+
+        // Actualizar la interfaz
+        document.querySelectorAll(".book-result").forEach((item) => {
+          item.classList.remove("selected");
+          const itemButton = item.querySelector("button");
+          itemButton.textContent = "Seleccionar libro";
+        });
+
+        card.classList.add("selected");
+        button.textContent = "Libro seleccionado";
+
+        selectedBookInfo.textContent =
+          `${book.title} — ${authors.textContent}`;
+
+        selectedBook.hidden = false;
+
+        bookSearchStatus.textContent = "Libro seleccionado correctamente.";
+        loadBookText(book);
+      });
+
+      card.append(title, authors, button);
+      bookResults.append(card);
+    });
+
+  } catch (error) {
+    console.error("Error al buscar libros:", error);
+    bookSearchStatus.textContent =
+      "Ocurrió un error al consultar Gutendex. Intenta nuevamente.";
+  } finally {
+    searchButton.disabled = false;
+  }
+});
+
+// ----------------------------------------------------------
+// Al seleccionar un libro se descarga su texto y reemplaza el contenido del cuadro de texto (sección 1A)
+// ----------------------------------------------------------
+const textArea = document.getElementById("text");
+const sourceInfo = document.getElementById("sourceInfo");
+let bookLoadId = 0;
+
+function bookTextUrl(book) {
+  const formats = book.formats || {};
+  const key = Object.keys(formats).find(k => k.startsWith("text/plain"));
+  return key ? formats[key] : null;
+}
+
+// Gutenberg no envía cabeceras CORS: primero se intenta directo y luego mediante un proxy CORS.
+async function fetchBookText(book) {
+  const urls = [bookTextUrl(book), `https://gutenberg.pglaf.org/cache/epub/${book.id}/pg${book.id}.txt`]
+    .filter(Boolean);
+  const attempts = [...urls, ...urls.map(u => `https://proxy.cors.dev/${u}`)];
+  let lastError = new Error("Este libro no tiene una versión de texto disponible.");
+  for (const url of attempts) {
+    try {
+      const response = await fetch(url, { credentials: "omit" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const text = await response.text();
+      if (text.trim()) return text;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError;
+}
+
+async function loadBookText(book) {
+  const id = ++bookLoadId;
+  document.dispatchEvent(new CustomEvent("source-loading", { detail: true }));
+  bookSearchStatus.textContent = "Descargando el texto del libro...";
+  try {
+    const text = await fetchBookText(book);
+    if (id !== bookLoadId) return; // se eligió otro libro mientras tanto
+    textArea.value = text;
+    textArea.dispatchEvent(new Event("input", { bubbles: true }));
+    sourceInfo.textContent =
+      `Fuente actual: libro «${book.title}» (${text.length.toLocaleString("es-MX")} caracteres).`;
+    bookSearchStatus.textContent =
+      "Libro seleccionado: el cuadro de texto ahora contiene su contenido. Pulsa Siguiente.";
+  } catch (error) {
+    if (id !== bookLoadId) return;
+    console.error("Error al descargar el libro:", error);
+    bookSearchStatus.textContent =
+      "No se pudo descargar el texto de este libro (conexión o CORS). Prueba con otro.";
+  } finally {
+    if (id === bookLoadId) {
+      document.dispatchEvent(new CustomEvent("source-loading", { detail: false }));
+    }
+  }
+}
 </script>
 </body>
 </html>
