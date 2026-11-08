@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -77,48 +78,14 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
 .seg button{background:transparent;color:var(--ink);border:0;border-radius:0;padding:8px 16px}
 .seg button[aria-pressed="true"]{background:var(--teal);color:var(--on-teal)}
 @media (prefers-reduced-motion:reduce){#ptr,.cell,.l,.count{transition:none}}
-
-/* Flujo visual del proyecto: Issue #13 */
-.workflow{
-  display:grid;
-  grid-template-columns:repeat(6,minmax(0,1fr));
-  gap:10px;
-  margin:0 0 22px;
-}
-.workflow-step{
-  position:relative;
-  min-height:126px;
-  padding:13px 11px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:var(--panel);
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
-.workflow-step.active{
-  border:2px solid var(--teal);
-  background:var(--teal-t);
-}
-.workflow-number{
-  width:28px;
-  height:28px;
-  display:grid;
-  place-items:center;
-  border-radius:50%;
-  background:var(--teal);
-  color:var(--on-teal);
-  font:600 13px "JetBrains Mono",ui-monospace,monospace;
-}
+.workflow{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:0 0 22px}
+.workflow-step{position:relative;min-height:126px;padding:13px 11px;border:1px solid var(--line);border-radius:10px;background:var(--panel);display:flex;flex-direction:column;gap:7px}
+.workflow-step.active{border:2px solid var(--teal);background:var(--teal-t)}
+.workflow-number{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--teal);color:var(--on-teal);font:600 13px "JetBrains Mono",ui-monospace,monospace}
 .workflow-step strong{font-size:14px;line-height:1.25}
 .workflow-step span:last-child{font-size:12px;color:var(--mute);line-height:1.35}
-@media(max-width:760px){
-  .workflow{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-@media(max-width:440px){
-  .workflow{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-
+@media(max-width:760px){.workflow{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:440px){.workflow{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -127,45 +94,21 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
   <p class="sub" id="sub">Escribe un texto y observa cómo se cuentan sus caracteres.</p>
 
   <section class="workflow" aria-label="Etapas del proceso de compresión Huffman">
-    <article class="workflow-step active">
-      <span class="workflow-number">01</span>
-      <strong>Buscar / Subir</strong>
-      <span>Seleccionar el texto que se desea comprimir.</span>
-    </article>
-    <article class="workflow-step">
-      <span class="workflow-number">02</span>
-      <strong>Analizar</strong>
-      <span>Revisar el contenido y calcular las frecuencias.</span>
-    </article>
-    <article class="workflow-step">
-      <span class="workflow-number">03</span>
-      <strong>Construir</strong>
-      <span>Visualizar la construcción del árbol de Huffman.</span>
-    </article>
-    <article class="workflow-step">
-      <span class="workflow-number">04</span>
-      <strong>Comprimir</strong>
-      <span>Generar la secuencia de bits codificada.</span>
-    </article>
-    <article class="workflow-step">
-      <span class="workflow-number">05</span>
-      <strong>Inspeccionar</strong>
-      <span>Consultar frecuencias, códigos y resultados.</span>
-    </article>
-    <article class="workflow-step">
-      <span class="workflow-number">06</span>
-      <strong>Descargar / Descomprimir</strong>
-      <span>Obtener el resultado o recuperar el texto original.</span>
-    </article>
+    <article class="workflow-step active"><span class="workflow-number">01</span><strong>Buscar / Subir</strong><span>Seleccionar el texto que se desea comprimir.</span></article>
+    <article class="workflow-step"><span class="workflow-number">02</span><strong>Analizar</strong><span>Revisar el contenido y calcular las frecuencias.</span></article>
+    <article class="workflow-step"><span class="workflow-number">03</span><strong>Construir</strong><span>Visualizar la construcción del árbol de Huffman.</span></article>
+    <article class="workflow-step"><span class="workflow-number">04</span><strong>Comprimir</strong><span>Generar la secuencia de bits codificada.</span></article>
+    <article class="workflow-step"><span class="workflow-number">05</span><strong>Inspeccionar</strong><span>Consultar frecuencias, códigos y resultados.</span></article>
+    <article class="workflow-step"><span class="workflow-number">06</span><strong>Descargar / Descomprimir</strong><span>Obtener el resultado o recuperar el texto original.</span></article>
   </section>
 
   <div id="stack" class="panel" aria-label="Cajas de frecuencia"></div>
 
   <div id="row">
-  <div id="tree" class="panel" hidden aria-label="Nodos y árbol de Huffman">
-    <div id="tin"><svg id="arrows" width="0" height="0"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker></defs></svg></div>
-  </div>
-  <div id="out" class="panel" hidden aria-label="Texto codificado"></div>
+    <div id="tree" class="panel" hidden aria-label="Nodos y árbol de Huffman">
+      <div id="tin"><svg id="arrows" width="0" height="0"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker></defs></svg></div>
+    </div>
+    <div id="out" class="panel" hidden aria-label="Texto codificado"></div>
   </div>
 
   <div class="seg" role="group" aria-label="Modo"><button id="mc" aria-pressed="true">Comprimir</button><button id="md" aria-pressed="false">Descomprimir</button></div>
@@ -176,6 +119,8 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
     <button id="start">Iniciar</button>
     <button id="next" disabled>Siguiente</button>
     <button id="reset" class="ghost" disabled>Reiniciar</button>
+    <button id="downloadTxt" class="ghost" disabled>Descargar .txt</button>
+    <button id="downloadSkyh" class="ghost" disabled>Descargar .skyh</button>
     <label class="sp">Velocidad <input id="speed" type="range" min="1" max="10" value="4"></label>
   </div>
   <p id="status" aria-live="polite"></p>
@@ -187,6 +132,7 @@ const label = c => c === " " ? "␣" : c === "\n" ? "↵" : c === "\t" ? "⇥" :
 
 class HuffmanViz {
   #text; #view; #stack; #status; #start; #next; #reset; #speed;
+  #downloadTxt; #downloadSkyh;
   #ptr = null; #cells = []; #boxes = new Map(); #token = 0;
   #tree; #tin; #arrows; #out; #mc; #md; #sub; #mode = "c"; #busy = false; #dActive = false; #ctext = ""; #chars = []; #codes = new Map(); #nodes = []; #queue = []; #stage = 0;
 
@@ -195,6 +141,8 @@ class HuffmanViz {
     this.#text = g("text"); this.#view = g("view"); this.#stack = g("stack");
     this.#status = g("status"); this.#start = g("start"); this.#next = g("next");
     this.#reset = g("reset"); this.#speed = g("speed");
+    this.#downloadTxt = g("downloadTxt");
+    this.#downloadSkyh = g("downloadSkyh");
     this.#tree = g("tree"); this.#tin = g("tin"); this.#arrows = g("arrows"); this.#out = g("out");
     this.#mc = g("mc"); this.#md = g("md"); this.#sub = g("sub");
     this.#mc.onclick = () => this.#setMode("c");
@@ -202,6 +150,8 @@ class HuffmanViz {
     this.#start.onclick = () => this.#run();
     this.#next.onclick = () => this.#advance();
     this.#reset.onclick = () => this.#restore();
+    this.#downloadTxt.onclick = () => this.#downloadText();
+    this.#downloadSkyh.onclick = () => this.#downloadSkyhFile();
     this.#sync();
   }
 
@@ -470,6 +420,68 @@ class HuffmanViz {
     this.#start.disabled = this.#busy || (!d && this.#stage > 0 && this.#stage < 6);
     this.#reset.disabled = !(this.#busy || (d ? this.#dActive : this.#stage > 0));
     if (d) this.#next.disabled = true;
+
+    const canDownload = !this.#busy && !d && this.#stage === 6;
+    this.#downloadTxt.disabled = !canDownload;
+    this.#downloadSkyh.disabled = !canDownload;
+  }
+
+  #getEncodedBits() {
+    return this.#chars.map(ch => this.#codes.get(ch)?.code ?? "").join("");
+  }
+
+  #downloadFile(content, filename, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  #downloadText() {
+    if (this.#stage !== 6 || this.#mode !== "c" || this.#busy) return;
+    const bits = this.#getEncodedBits();
+    this.#downloadFile(
+      bits,
+      "texto_comprimido.txt",
+      "text/plain;charset=utf-8"
+    );
+    this.#status.textContent = "Archivo TXT descargado correctamente.";
+  }
+
+  #downloadSkyhFile() {
+    if (this.#stage !== 6 || this.#mode !== "c" || this.#busy) return;
+
+    const bits = this.#getEncodedBits();
+
+    const data = {
+      format: "SKYH",
+      version: 1,
+      algorithm: "Huffman",
+      originalLength: this.#chars.length,
+      bitLength: bits.length,
+      bits,
+      frequencies: [...this.#boxes.entries()].map(([character, box]) => ({
+        character,
+        frequency: box.n
+      })),
+      codes: [...this.#codes.entries()].map(([character, data]) => ({
+        character,
+        code: data.code
+      }))
+    };
+
+    this.#downloadFile(
+      JSON.stringify(data, null, 2),
+      "texto_comprimido.skyh",
+      "application/json;charset=utf-8"
+    );
+
+    this.#status.textContent = "Archivo SKYH descargado correctamente.";
   }
 
   #cleanD() {
@@ -490,7 +502,7 @@ class HuffmanViz {
     if (m === "d") {
       this.#ctext = this.#text.value;
       const ready = this.#stage === 6;
-      this.#text.value = ready ? this.#chars.map(c => this.#codes.get(c)?.code ?? "").join("") : "";
+      this.#text.value = ready ? this.#getEncodedBits() : "";
       this.#text.placeholder = "Escribe una secuencia de 0 y 1";
       this.#text.setAttribute("aria-label", "Secuencia binaria a decodificar");
       this.#sub.textContent = "Escribe una secuencia de 0 y 1 y observa cómo el árbol la convierte en texto.";
