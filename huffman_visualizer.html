@@ -32,7 +32,7 @@ h1{font-size:26px;margin:0 0 4px;font-weight:600;letter-spacing:-.01em}
 .sub{margin:0 0 20px;color:var(--mute)}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
 #stack{display:flex;gap:12px;align-items:flex-start;overflow-x:auto;position:relative;min-height:170px;padding:12px 4px 10px;margin-bottom:16px}
-#stack:empty::before{content:"Las cajas de frecuencia irán apareciendo aquí.";color:var(--mute);align-self:center;padding-left:8px}
+#stack:empty{display:none}
 .box{flex:none;width:68px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .count{font:600 18px "JetBrains Mono",ui-monospace,monospace;height:26px;opacity:0;transition:opacity .3s}
 .counting .count{opacity:1}
@@ -232,12 +232,22 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
     width: 100%;
   }
 }
+
+/* Etapa 1: tres secciones de entrada (texto, archivo, libro) */
+#inputs{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
+.input-card{padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.input-card h2{margin:0 0 10px;font-size:19px}
+.input-card textarea{margin-bottom:8px}
+.input-card .file-info{margin:0}
+.input-card .file-picker{margin:0}
+#inputs .book-search{margin:0}
+.tag{display:inline-grid;place-items:center;min-width:34px;height:24px;padding:0 6px;margin-right:6px;border-radius:6px;background:var(--teal);color:var(--on-teal);font:600 13px "JetBrains Mono",ui-monospace,monospace;vertical-align:middle}
 </style>
 </head>
 <body>
 <main>
   <h1>Huffman paso a paso</h1>
-  <p class="sub" id="sub">Escribe un texto y observa cómo se cuentan sus caracteres.</p>
+  <p class="sub" id="sub">Etapa 1: escribe un texto, elige un archivo .txt o busca un libro. Después pulsa Siguiente.</p>
 
   <section class="workflow" aria-label="Etapas del proceso de compresión Huffman">
     <article class="workflow-step active">
@@ -272,17 +282,25 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
     </article>
   </section>
 
-  <div id="stack" class="panel" aria-label="Cajas de frecuencia"></div>
+  <div class="seg" role="group" aria-label="Modo"><button id="mc" aria-pressed="true">Comprimir</button><button id="md" aria-pressed="false">Descomprimir</button></div>
 
-  <div id="row">
-  <div id="tree" class="panel" hidden aria-label="Nodos y árbol de Huffman">
-    <div id="tin"><svg id="arrows" width="0" height="0"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker></defs></svg></div>
+  <!-- Etapa 1: tres fuentes de entrada, cada una en su propia sección -->
+  <div id="inputs">
+    <section class="input-card" id="sec-text" aria-labelledby="sec-text-title">
+      <h2 id="sec-text-title"><span class="tag">1A</span> <span id="sec-text-label">Escribir texto</span></h2>
+  <textarea id="text" aria-label="Texto a analizar">Esto es un ejemplo de compresión</textarea>
+      <p id="sourceInfo" class="file-info" aria-live="polite">Fuente actual: texto escrito.</p>
+    </section>
+    <section class="input-card" id="sec-file" aria-labelledby="sec-file-title">
+      <h2 id="sec-file-title"><span class="tag">1B</span> Elegir archivo</h2>
+  <div class="file-picker">
+    <label for="fileInput">Cargar archivo de texto (.txt)</label>
+    <input id="fileInput" type="file" accept=".txt,text/plain">
+    <span id="fileInfo" class="file-info" aria-live="polite">No se ha seleccionado ningún archivo.</span>
   </div>
-  <div id="out" class="panel" hidden aria-label="Texto codificado"></div>
-  </div>
-<!-- Buscador de libros Gutendex - Issue #20 -->
-<section class="book-search" aria-labelledby="book-search-title">
-  <h2 id="book-search-title">Buscar un libro</h2>
+    </section>
+<section class="book-search" id="sec-book" aria-labelledby="book-search-title">
+  <h2 id="book-search-title"><span class="tag">1C</span> Buscar un libro</h2>
   <p>Encuentra libros por título, autor o palabra clave usando Gutendex.</p>
 
   <form id="book-search-form" class="book-search-form">
@@ -305,13 +323,16 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
     <p id="selected-book-info"></p>
   </div>
 </section>
-  <div class="seg" role="group" aria-label="Modo"><button id="mc" aria-pressed="true">Comprimir</button><button id="md" aria-pressed="false">Descomprimir</button></div>
-  <div class="file-picker">
-    <label for="fileInput">Cargar archivo de texto (.txt)</label>
-    <input id="fileInput" type="file" accept=".txt,text/plain">
-    <span id="fileInfo" class="file-info" aria-live="polite">No se ha seleccionado ningún archivo.</span>
   </div>
-  <textarea id="text" aria-label="Texto a analizar">Esto es un ejemplo de compresión</textarea>
+
+  <!-- Etapa 2: las cajas de frecuencia aparecen al pulsar Siguiente -->
+  <div id="stack" class="panel" aria-label="Cajas de frecuencia"></div>
+  <div id="row">
+  <div id="tree" class="panel" hidden aria-label="Nodos y árbol de Huffman">
+    <div id="tin"><svg id="arrows" width="0" height="0"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker></defs></svg></div>
+  </div>
+  <div id="out" class="panel" hidden aria-label="Texto codificado"></div>
+  </div>
   <div id="view" class="panel" hidden></div>
 
   <div class="bar">
@@ -325,10 +346,13 @@ label.sp{display:flex;gap:8px;align-items:center;color:var(--mute);margin-left:a
 
 <script>
 const CANCEL = Symbol("cancel");
+// Por encima de este número de caracteres no se anima el conteo uno por uno (p. ej. un libro completo).
+const MAX_ANIM = 1500;
 const label = c => c === " " ? "␣" : c === "\n" ? "↵" : c === "\t" ? "⇥" : c;
 
 class HuffmanViz {
   #text; #view; #stack; #status; #start; #next; #reset; #speed; #fileInput; #fileInfo;
+  #inputs; #sourceInfo; #secFile; #secBook; #secTextLabel; #steps; #loading = false;
   #fileBytes = new Uint8Array();
   #ptr = null; #cells = []; #boxes = new Map(); #token = 0;
   #tree; #tin; #arrows; #out; #mc; #md; #sub; #mode = "c"; #busy = false; #dActive = false; #ctext = ""; #chars = []; #codes = new Map(); #nodes = []; #queue = []; #stage = 0;
@@ -340,6 +364,15 @@ class HuffmanViz {
     this.#reset = g("reset"); this.#speed = g("speed");
     this.#fileInput = g("fileInput"); this.#fileInfo = g("fileInfo");
     this.#fileInput.addEventListener("change", () => this.#loadFile());
+    this.#inputs = g("inputs"); this.#sourceInfo = g("sourceInfo");
+    this.#secFile = g("sec-file"); this.#secBook = g("sec-book"); this.#secTextLabel = g("sec-text-label");
+    this.#steps = [...document.querySelectorAll(".workflow-step")];
+    // Si el usuario escribe a mano, la fuente vuelve a ser el texto escrito.
+    this.#text.addEventListener("input", () => {
+      if (this.#mode === "c") this.#sourceInfo.textContent = "Fuente actual: texto escrito.";
+    });
+    // El buscador de libros avisa mientras descarga el texto para bloquear Siguiente.
+    document.addEventListener("source-loading", e => { this.#loading = e.detail; this.#sync(); });
     this.#tree = g("tree"); this.#tin = g("tin"); this.#arrows = g("arrows"); this.#out = g("out");
     this.#mc = g("mc"); this.#md = g("md"); this.#sub = g("sub");
     this.#mc.onclick = () => this.#setMode("c");
@@ -369,13 +402,14 @@ class HuffmanViz {
       const content = new TextDecoder("utf-8", { fatal: true }).decode(this.#fileBytes);
 
       this.#restore();
-      this.#text.value = content;
+      this.#text.value = content; // el cuadro de texto se reemplaza por el contenido del archivo
       this.#ctext = content;
       this.#fileInfo.textContent =
         `${file.name} · ${this.#fileBytes.length.toLocaleString("es-MX")} bytes`;
+      this.#sourceInfo.textContent = `Fuente actual: archivo ${file.name}.`;
       this.#status.textContent =
-        `Archivo cargado correctamente: ${this.#fileBytes.length} bytes leídos en un Uint8Array. Pulsa Iniciar para analizar el texto.`;
-      this.#text.hidden = false;
+        `Archivo cargado correctamente: ${this.#fileBytes.length} bytes leídos en un Uint8Array. Pulsa Siguiente para analizar el texto.`;
+      this.#inputs.hidden = false;
       this.#view.hidden = true;
     } catch (error) {
       this.#fileBytes = new Uint8Array();
@@ -393,7 +427,7 @@ class HuffmanViz {
   }
 
   #build(chars) {
-    this.#text.hidden = true;
+    this.#inputs.hidden = true;
     this.#view.hidden = false;
     this.#view.innerHTML = "";
     this.#stack.innerHTML = "";
@@ -443,20 +477,26 @@ class HuffmanViz {
 
   async #run() {
     if (this.#mode === "d") return this.#runDecomp();
-    const chars = [...this.#text.value];
-    if (!chars.length) {
+    const all = [...this.#text.value];
+    if (!all.length) {
       this.#status.textContent = "Escribe un texto para empezar.";
       this.#text.focus();
       return;
     }
+    const big = all.length > MAX_ANIM;
+    const chars = big ? all.slice(0, MAX_ANIM) : all;
     const t = ++this.#token;
     this.#build(chars);
     this.#next.disabled = true;
     this.#busy = true;
     this.#sync();
     try {
-      await this.#countPhase(chars, t);
-      await this.#clearPhase(t);
+      if (big) {
+        await this.#fastCount(all, t);
+      } else {
+        await this.#countPhase(chars, t);
+        await this.#clearPhase(t);
+      }
     } catch (e) {
       if (e !== CANCEL) throw e;
     } finally {
@@ -504,6 +544,25 @@ class HuffmanViz {
       }
       cell.classList.add("seen");
     }
+  }
+
+  // Textos largos (libros): se cuentan todos los caracteres de golpe, sin animar cada uno.
+  async #fastCount(all, t) {
+    this.#status.textContent = `Etapa 2: contando ${all.length.toLocaleString("es-MX")} caracteres…`;
+    await this.#sleep(this.#step * 0.5, t);
+    const freq = new Map();
+    for (const ch of all) freq.set(ch, (freq.get(ch) || 0) + 1);
+    for (const [ch, n] of freq) {
+      const box = this.#newBox(ch);
+      box.n = n;
+      box.count.textContent = n;
+    }
+    this.#stack.classList.add("counting");
+    this.#status.textContent =
+      `Listo: ${freq.size} caracteres distintos en ${all.length.toLocaleString("es-MX")} en total. ` +
+      `Texto largo: las frecuencias son de todo el texto, pero la codificación (etapa 6) se animará solo con los primeros ${MAX_ANIM} caracteres. Pulsa Siguiente para continuar.`;
+    this.#stage = 2;
+    this.#next.disabled = false;
   }
 
   async #clearPhase(t) {
@@ -649,9 +708,16 @@ class HuffmanViz {
     const lock = this.#busy || (this.#stage > 0 && this.#stage < 6), d = this.#mode === "d";
     this.#mc.disabled = lock; this.#md.disabled = lock;
     this.#fileInput.disabled = lock || d;
+    this.#start.hidden = !d; // en modo comprimir se avanza solo con Siguiente
     this.#start.disabled = this.#busy || (!d && this.#stage > 0 && this.#stage < 6);
     this.#reset.disabled = !(this.#busy || (d ? this.#dActive : this.#stage > 0));
+    this.#secFile.hidden = d; this.#secBook.hidden = d;
     if (d) this.#next.disabled = true;
+    else if (!this.#busy && this.#stage === 0) this.#next.disabled = this.#loading;
+    // Resalta la etapa del flujo en la que estamos.
+    const s = this.#stage;
+    const step = this.#busy && s === 0 ? 2 : s === 0 ? 1 : s <= 2 ? 2 : s <= 5 ? 3 : 4;
+    this.#steps.forEach((el, i) => el.classList.toggle("active", i === step - 1));
   }
 
   #cleanD() {
@@ -667,8 +733,10 @@ class HuffmanViz {
     this.#mc.setAttribute("aria-pressed", m === "c");
     this.#md.setAttribute("aria-pressed", m === "d");
     this.#view.hidden = true;
-    this.#text.hidden = false;
+    this.#inputs.hidden = false;
     this.#next.disabled = true;
+    this.#secTextLabel.textContent = m === "d" ? "Secuencia binaria" : "Escribir texto";
+    this.#sourceInfo.hidden = m === "d";
     if (m === "d") {
       this.#ctext = this.#text.value;
       const ready = this.#stage === 6;
@@ -681,7 +749,7 @@ class HuffmanViz {
       this.#text.value = this.#ctext;
       this.#text.placeholder = "";
       this.#text.setAttribute("aria-label", "Texto a analizar");
-      this.#sub.textContent = "Escribe un texto y observa cómo se cuentan sus caracteres.";
+      this.#sub.textContent = "Etapa 1: escribe un texto, elige un archivo .txt o busca un libro. Después pulsa Siguiente.";
       this.#status.textContent = "";
     }
     this.#sync();
@@ -695,7 +763,7 @@ class HuffmanViz {
     const bits = [...raw], t = ++this.#token;
     this.#cleanD();
     this.#dActive = true; this.#busy = true;
-    this.#text.hidden = true; this.#view.hidden = false;
+    this.#inputs.hidden = true; this.#view.hidden = false;
     this.#view.innerHTML = ""; this.#out.innerHTML = ""; this.#view.scrollTop = 0;
     this.#cells = bits.map(b => {
       const s = document.createElement("span");
@@ -722,7 +790,7 @@ class HuffmanViz {
     this.#cleanD();
     this.#out.innerHTML = "";
     this.#view.hidden = true;
-    this.#text.hidden = false;
+    this.#inputs.hidden = false;
     this.#status.textContent = "";
     this.#sync();
   }
@@ -911,6 +979,7 @@ class HuffmanViz {
   }
 
   async #advance() {
+    if (this.#stage === 0) return this.#run(); // Etapa 1 → 2: analizar y mostrar las cajas de frecuencia
     const t = this.#token;
     this.#next.disabled = true;
     this.#busy = true;
@@ -953,7 +1022,7 @@ class HuffmanViz {
     this.#cells = [];
     this.#clearTree();
     this.#view.hidden = true;
-    this.#text.hidden = false;
+    this.#inputs.hidden = false;
     this.#start.disabled = false;
     this.#next.disabled = true;
     this.#reset.disabled = true;
@@ -1056,6 +1125,7 @@ bookSearchForm.addEventListener("submit", async (event) => {
         selectedBook.hidden = false;
 
         bookSearchStatus.textContent = "Libro seleccionado correctamente.";
+        loadBookText(book);
       });
 
       card.append(title, authors, button);
@@ -1070,6 +1140,63 @@ bookSearchForm.addEventListener("submit", async (event) => {
     searchButton.disabled = false;
   }
 });
+
+// ----------------------------------------------------------
+// Al seleccionar un libro se descarga su texto y reemplaza el contenido del cuadro de texto (sección 1A)
+// ----------------------------------------------------------
+const textArea = document.getElementById("text");
+const sourceInfo = document.getElementById("sourceInfo");
+let bookLoadId = 0;
+
+function bookTextUrl(book) {
+  const formats = book.formats || {};
+  const key = Object.keys(formats).find(k => k.startsWith("text/plain"));
+  return key ? formats[key] : null;
+}
+
+// Gutenberg no envía cabeceras CORS: primero se intenta directo y luego mediante un proxy CORS.
+async function fetchBookText(book) {
+  const urls = [bookTextUrl(book), `https://gutenberg.pglaf.org/cache/epub/${book.id}/pg${book.id}.txt`]
+    .filter(Boolean);
+  const attempts = [...urls, ...urls.map(u => `https://proxy.cors.dev/${u}`)];
+  let lastError = new Error("Este libro no tiene una versión de texto disponible.");
+  for (const url of attempts) {
+    try {
+      const response = await fetch(url, { credentials: "omit" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const text = await response.text();
+      if (text.trim()) return text;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError;
+}
+
+async function loadBookText(book) {
+  const id = ++bookLoadId;
+  document.dispatchEvent(new CustomEvent("source-loading", { detail: true }));
+  bookSearchStatus.textContent = "Descargando el texto del libro...";
+  try {
+    const text = await fetchBookText(book);
+    if (id !== bookLoadId) return; // se eligió otro libro mientras tanto
+    textArea.value = text;
+    textArea.dispatchEvent(new Event("input", { bubbles: true }));
+    sourceInfo.textContent =
+      `Fuente actual: libro «${book.title}» (${text.length.toLocaleString("es-MX")} caracteres).`;
+    bookSearchStatus.textContent =
+      "Libro seleccionado: el cuadro de texto ahora contiene su contenido. Pulsa Siguiente.";
+  } catch (error) {
+    if (id !== bookLoadId) return;
+    console.error("Error al descargar el libro:", error);
+    bookSearchStatus.textContent =
+      "No se pudo descargar el texto de este libro (conexión o CORS). Prueba con otro.";
+  } finally {
+    if (id === bookLoadId) {
+      document.dispatchEvent(new CustomEvent("source-loading", { detail: false }));
+    }
+  }
+}
 </script>
 </body>
 </html>
